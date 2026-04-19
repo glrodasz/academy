@@ -54,8 +54,8 @@ function PrimaryButton({ children, onClick, size = "md" }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        backgroundColor: hover ? tokens.primarySubtle : tokens.primary,
-        color: tokens.white,
+        backgroundColor: hover ? "#3d9a6d" : tokens.accent,
+        color: tokens.primary,
         padding,
         fontSize,
         fontWeight: 700,
