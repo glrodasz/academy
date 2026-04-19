@@ -10,3 +10,20 @@ body {
 #root {
   width: 100%;
 }
+
+/* Nav responsive */
+@media (max-width: 640px) {
+  .nav-desktop-links,
+  .nav-desktop-cta {
+    display: none !important;
+  }
+  .nav-hamburger {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .nav-mobile-drawer {
+    display: none !important;
+  }
+}

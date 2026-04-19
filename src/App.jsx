@@ -98,7 +98,39 @@ function SecondaryButton({ children, onClick }) {
 
 // ─── SECTIONS ─────────────────────────────────────────────────
 
+const NAV_LINKS = [
+  { href: "#contenidos", label: "Contenidos" },
+  { href: "#profesor", label: "Profesor" },
+  { href: "#testimonios", label: "Testimonios" },
+  { href: "#faq", label: "FAQ" },
+];
+
+function HamburgerIcon({ open }) {
+  const bar = (top, rotate, opacity = 1) => ({
+    position: "absolute",
+    left: 0,
+    width: 22,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: tokens.white,
+    top,
+    transition: "transform 0.25s, opacity 0.25s",
+    transform: rotate,
+    opacity,
+  });
+  return (
+    <div style={{ position: "relative", width: 22, height: 16 }}>
+      <span style={bar(0,  open ? "translateY(7px) rotate(45deg)" : "none")} />
+      <span style={bar(7,  "none", open ? 0 : 1)} />
+      <span style={bar(14, open ? "translateY(-7px) rotate(-45deg)" : "none")} />
+    </div>
+  );
+}
+
 function Nav() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const close = () => setMenuOpen(false);
+
   return (
     <nav style={{
       position: "sticky",
@@ -106,27 +138,87 @@ function Nav() {
       zIndex: 100,
       backgroundColor: tokens.primary,
       borderBottom: `3px solid ${tokens.accent}`,
-      padding: "0 32px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      height: 64,
     }}>
-      <span style={{
-        color: tokens.white,
-        fontWeight: 800,
-        fontSize: 20,
-        letterSpacing: "-0.02em",
+      {/* Top bar */}
+      <div style={{
+        padding: "0 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        height: 64,
       }}>
-        undefined<span style={{ color: tokens.accent }}>.academy</span>
-      </span>
-      <div style={{ display: "flex", gap: 12 }}>
-        <a href="#contenidos" style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>Contenidos</a>
-        <a href="#profesor" style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>Profesor</a>
-        <a href="#testimonios" style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>Testimonios</a>
-        <a href="#faq" style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>FAQ</a>
+        <span style={{
+          color: tokens.white,
+          fontWeight: 800,
+          fontSize: 20,
+          letterSpacing: "-0.02em",
+        }}>
+          undefined<span style={{ color: tokens.accent }}>.academy</span>
+        </span>
+
+        {/* Desktop links */}
+        <div style={{ display: "flex", gap: 12, "@media(max-width:640px)": { display: "none" } }}
+          className="nav-desktop-links">
+          {NAV_LINKS.map(({ href, label }) => (
+            <a key={href} href={href} style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>{label}</a>
+          ))}
+        </div>
+
+        {/* Desktop CTA */}
+        <div className="nav-desktop-cta">
+          <PrimaryButton size="sm">Inscribirse →</PrimaryButton>
+        </div>
+
+        {/* Hamburger (mobile only) */}
+        <button
+          onClick={() => setMenuOpen((o) => !o)}
+          className="nav-hamburger"
+          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 8,
+            display: "none",
+          }}
+        >
+          <HamburgerIcon open={menuOpen} />
+        </button>
       </div>
-      <PrimaryButton size="sm">Inscribirse →</PrimaryButton>
+
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div style={{
+          backgroundColor: tokens.primary,
+          borderTop: `1px solid #ffffff18`,
+          padding: "16px 24px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 4,
+        }}
+          className="nav-mobile-drawer">
+          {NAV_LINKS.map(({ href, label }) => (
+            <a
+              key={href}
+              href={href}
+              onClick={close}
+              style={{
+                color: tokens.neutralMid,
+                textDecoration: "none",
+                fontSize: 16,
+                fontWeight: 600,
+                padding: "12px 0",
+                borderBottom: "1px solid #ffffff10",
+              }}
+            >
+              {label}
+            </a>
+          ))}
+          <div style={{ marginTop: 16 }}>
+            <PrimaryButton size="lg" onClick={close}>Inscribirse →</PrimaryButton>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
