@@ -882,7 +882,7 @@ function CTASection({ onSignup }) {
           }}>
             Inscribirse gratis →
           </button>
-          <button style={{
+          <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={{
             backgroundColor: "transparent",
             color: tokens.primary,
             padding: "16px 36px",
@@ -892,9 +892,11 @@ function CTASection({ onSignup }) {
             border: `2px solid ${tokens.primary}`,
             borderRadius: 8,
             cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-block",
           }}>
             Unirse al Discord
-          </button>
+          </a>
         </div>
       </div>
     </section>
@@ -910,8 +912,17 @@ function Footer() {
         </span>
       </div>
       <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", marginBottom: 24 }}>
-        {["Discord", "YouTube", "Twitter", "Instagram", "Twitch"].map((social) => (
-          <a key={social} href="#" style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>{social}</a>
+        {[
+          { label: "Discord",   href: "https://undf.sh/discord" },
+          { label: "YouTube",   href: "https://undf.sh/en-diferido" },
+          { label: "Twitter",   href: "https://twitter.com/undefinedshell" },
+          { label: "Instagram", href: "https://instagram.com/undefinedshell" },
+          { label: "Twitch",    href: "https://undf.sh/en-vivo" },
+        ].map(({ label, href }) => (
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+            style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
+            {label}
+          </a>
         ))}
       </div>
       <p style={{ fontSize: 13, color: "#ffffff55" }}>
