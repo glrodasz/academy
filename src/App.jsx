@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+// TODO: replace with your Brevo API key and list ID
+const BREVO_API_KEY = "YOUR_BREVO_API_KEY";
+const BREVO_LIST_ID = 0; // e.g. 3
+
 // Quantum Design System — Mint Blue theme
 // System tokens remapped: Prussian Blue (Primary) + Mint (Complementary)
 const tokens = {
@@ -96,6 +100,167 @@ function SecondaryButton({ children, onClick }) {
   );
 }
 
+async function subscribeToBrevo({ name, email }) {
+  const res = await fetch("https://api.brevo.com/v3/contacts", {
+    method: "POST",
+    headers: {
+      "api-key": BREVO_API_KEY,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      attributes: { FIRSTNAME: name },
+      listIds: [BREVO_LIST_ID],
+      updateEnabled: true,
+    }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || "Error al suscribirse");
+  }
+}
+
+function SignupModal({ onClose }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("loading");
+    try {
+      await subscribeToBrevo({ name, email });
+      setStatus("success");
+    } catch (err) {
+      setErrorMsg(err.message);
+      setStatus("error");
+    }
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "12px 14px",
+    fontSize: 15,
+    fontFamily: "'Manrope', sans-serif",
+    border: `1.5px solid ${tokens.neutralMid}`,
+    borderRadius: 8,
+    outline: "none",
+    color: tokens.neutralPrincipal,
+    boxSizing: "border-box",
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+        padding: 24,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          backgroundColor: tokens.white,
+          borderRadius: 16,
+          padding: "40px 36px",
+          width: "100%",
+          maxWidth: 420,
+          position: "relative",
+        }}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          aria-label="Cerrar"
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontSize: 22,
+            color: tokens.neutralMid,
+            lineHeight: 1,
+          }}
+        >
+          ✕
+        </button>
+
+        {status === "success" ? (
+          <div style={{ textAlign: "center", padding: "16px 0" }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "0 0 8px" }}>
+              ¡Ya estás inscrito/a!
+            </h3>
+            <p style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.6 }}>
+              Revisa tu correo para los próximos pasos.
+            </p>
+          </div>
+        ) : (
+          <>
+            <Badge>Bootcamp gratuito</Badge>
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "12px 0 4px" }}>
+              Inscríbete al bootcamp
+            </h3>
+            <p style={{ fontSize: 14, color: tokens.neutralPrincipal, marginBottom: 24, lineHeight: 1.5 }}>
+              16 semanas · Full-stack JavaScript · 100% gratis
+            </p>
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <input
+                required
+                type="text"
+                placeholder="Tu nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                style={inputStyle}
+              />
+              <input
+                required
+                type="email"
+                placeholder="Tu correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={inputStyle}
+              />
+              {status === "error" && (
+                <p style={{ fontSize: 13, color: "#c0392b", margin: 0 }}>{errorMsg}</p>
+              )}
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                style={{
+                  backgroundColor: status === "loading" ? tokens.neutralMid : tokens.primary,
+                  color: tokens.white,
+                  padding: "14px",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  fontFamily: "'Manrope', sans-serif",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: status === "loading" ? "not-allowed" : "pointer",
+                  transition: "background-color 0.2s",
+                  marginTop: 4,
+                }}
+              >
+                {status === "loading" ? "Enviando…" : "Inscribirse gratis →"}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── SECTIONS ─────────────────────────────────────────────────
 
 const NAV_LINKS = [
@@ -127,7 +292,7 @@ function HamburgerIcon({ open }) {
   );
 }
 
-function Nav() {
+function Nav({ onSignup }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = () => setMenuOpen(false);
 
@@ -166,7 +331,7 @@ function Nav() {
 
         {/* Desktop CTA */}
         <div className="nav-desktop-cta">
-          <PrimaryButton size="sm">Inscribirse →</PrimaryButton>
+          <PrimaryButton size="sm" onClick={onSignup}>Inscribirse →</PrimaryButton>
         </div>
 
         {/* Hamburger (mobile only) */}
@@ -215,7 +380,7 @@ function Nav() {
             </a>
           ))}
           <div style={{ marginTop: 16 }}>
-            <PrimaryButton size="lg" onClick={close}>Inscribirse →</PrimaryButton>
+            <PrimaryButton size="lg" onClick={() => { close(); onSignup(); }}>Inscribirse →</PrimaryButton>
           </div>
         </div>
       )}
@@ -223,7 +388,7 @@ function Nav() {
   );
 }
 
-function Hero() {
+function Hero({ onSignup }) {
   return (
     <section style={{
       background: `linear-gradient(135deg, ${tokens.primary} 60%, #004a6e 100%)`,
@@ -267,7 +432,7 @@ function Hero() {
           16 semanas de formación intensiva en JavaScript — completamente gratis y 100% online.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <PrimaryButton size="lg">Inscribirse gratis →</PrimaryButton>
+          <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
           <SecondaryButton>Ver contenidos</SecondaryButton>
         </div>
         <div style={{
@@ -693,7 +858,7 @@ function FAQSection() {
   );
 }
 
-function CTASection() {
+function CTASection({ onSignup }) {
   return (
     <section style={{
       backgroundColor: tokens.accent,
@@ -708,7 +873,7 @@ function CTASection() {
           Únete al bootcamp más completo de Full-stack JavaScript. Gratis, online y con una comunidad increíble.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button style={{
+          <button onClick={onSignup} style={{
             backgroundColor: tokens.primary,
             color: tokens.white,
             padding: "16px 36px",
@@ -763,17 +928,22 @@ function Footer() {
 // ─── APP ──────────────────────────────────────────────────────
 
 export default function App() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const openSignup = () => setModalOpen(true);
+  const closeSignup = () => setModalOpen(false);
+
   return (
     <div style={styles.global}>
       <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-      <Nav />
-      <Hero />
+      <Nav onSignup={openSignup} />
+      <Hero onSignup={openSignup} />
       <CurriculumSection />
       <InstructorSection />
       <TestimonialsSection />
       <FAQSection />
-      <CTASection />
+      <CTASection onSignup={openSignup} />
       <Footer />
+      {modalOpen && <SignupModal onClose={closeSignup} />}
     </div>
   );
 }
