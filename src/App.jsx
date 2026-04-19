@@ -302,14 +302,16 @@ function Nav({ onSignup }) {
         justifyContent: "space-between",
         height: 64,
       }}>
-        <span style={{
-          color: tokens.white,
-          fontWeight: 800,
-          fontSize: 20,
-          letterSpacing: "-0.02em",
-        }}>
-          undefined<span style={{ color: tokens.accent }}>.academy</span>
-        </span>
+        <a href="/" style={{ textDecoration: "none" }}>
+          <span style={{
+            color: tokens.white,
+            fontWeight: 800,
+            fontSize: 20,
+            letterSpacing: "-0.02em",
+          }}>
+            undefined<span style={{ color: tokens.accent }}>.academy</span>
+          </span>
+        </a>
 
         {/* Desktop links */}
         <div style={{ display: "flex", gap: 12, "@media(max-width:640px)": { display: "none" } }}
