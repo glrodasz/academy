@@ -54,8 +54,8 @@ function PrimaryButton({ children, onClick, size = "md" }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        backgroundColor: hover ? tokens.primarySubtle : tokens.primary,
-        color: tokens.white,
+        backgroundColor: hover ? "#3d9a6d" : tokens.accent,
+        color: tokens.primary,
         padding,
         fontSize,
         fontWeight: 700,
@@ -72,8 +72,10 @@ function PrimaryButton({ children, onClick, size = "md" }) {
   );
 }
 
-function SecondaryButton({ children, onClick }) {
+function SecondaryButton({ children, onClick, variant = "dark" }) {
   const [hover, setHover] = useState(false);
+  const baseColor = variant === "light" ? tokens.white : tokens.primary;
+  const hoverColor = variant === "light" ? tokens.primaryOff : tokens.primarySubtle;
   return (
     <button
       onClick={onClick}
@@ -81,12 +83,12 @@ function SecondaryButton({ children, onClick }) {
       onMouseLeave={() => setHover(false)}
       style={{
         backgroundColor: "transparent",
-        color: hover ? tokens.primarySubtle : tokens.primary,
+        color: hover ? hoverColor : baseColor,
         padding: "12px 24px",
         fontSize: 15,
         fontWeight: 700,
         fontFamily: "'Manrope', sans-serif",
-        border: `2px solid ${hover ? tokens.primarySubtle : tokens.primary}`,
+        border: `2px solid ${hover ? hoverColor : baseColor}`,
         borderRadius: 8,
         cursor: "pointer",
         transition: "all 0.2s",
@@ -300,14 +302,16 @@ function Nav({ onSignup }) {
         justifyContent: "space-between",
         height: 64,
       }}>
-        <span style={{
-          color: tokens.white,
-          fontWeight: 800,
-          fontSize: 20,
-          letterSpacing: "-0.02em",
-        }}>
-          undefined<span style={{ color: tokens.accent }}>.academy</span>
-        </span>
+        <a href="/" style={{ textDecoration: "none" }}>
+          <span style={{
+            color: tokens.white,
+            fontWeight: 800,
+            fontSize: 20,
+            letterSpacing: "-0.02em",
+          }}>
+            undefined<span style={{ color: tokens.accent }}>.academy</span>
+          </span>
+        </a>
 
         {/* Desktop links */}
         <div style={{ display: "flex", gap: 12, "@media(max-width:640px)": { display: "none" } }}
@@ -421,7 +425,7 @@ function Hero({ onSignup }) {
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
-          <SecondaryButton>Ver contenidos</SecondaryButton>
+          <SecondaryButton variant="light" onClick={() => document.getElementById("contenidos").scrollIntoView({ behavior: "smooth" })}>Ver contenidos</SecondaryButton>
         </div>
         <div style={{
           marginTop: 56,
@@ -591,7 +595,7 @@ function CurriculumSection() {
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <Badge>Programa</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 8px", color: tokens.primary }}>
-          📚 Contenidos
+          <span aria-hidden="true">📚 </span>Contenidos
         </h2>
         <p style={{ fontSize: 17, color: tokens.neutralPrincipal, marginBottom: 40, lineHeight: 1.6 }}>
           De cero a Full-stack en 16 semanas con un currículo estructurado y progresivo.
@@ -693,7 +697,7 @@ function InstructorSection() {
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
           <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em", margin: "12px 0 8px", color: tokens.primary }}>
-            🎓 Guillermo Rodas
+            <span aria-hidden="true">🎓 </span>Guillermo Rodas
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.neutralPrincipal, marginBottom: 20 }}>
             Desarrollador Full-stack en JavaScript de Colombia viviendo en Suecia.
@@ -748,7 +752,7 @@ function TestimonialsSection() {
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <Badge>Testimonios</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 48px", color: tokens.white }}>
-          🌟 Lo que dicen los estudiantes
+          <span aria-hidden="true">🌟 </span>Lo que dicen los estudiantes
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
           {TESTIMONIALS.map(({ name, handle, role, quote, image }) => (
@@ -806,7 +810,7 @@ function FAQSection() {
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <Badge>Preguntas frecuentes</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 40px", color: tokens.primary }}>
-          🙋 FAQ
+          <span aria-hidden="true">🙋 </span>FAQ
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {FAQ_ITEMS.map(({ q, a }, i) => (
