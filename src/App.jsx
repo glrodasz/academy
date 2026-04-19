@@ -1,8 +1,5 @@
 import { useState } from "react";
 
-// TODO: replace with your Brevo API key and list ID
-const BREVO_API_KEY = "YOUR_BREVO_API_KEY";
-const BREVO_LIST_ID = 0; // e.g. 3
 
 // Quantum Design System — Mint Blue theme
 // System tokens remapped: Prussian Blue (Primary) + Mint (Complementary)
@@ -101,19 +98,10 @@ function SecondaryButton({ children, onClick }) {
 }
 
 async function subscribeToBrevo({ name, email }) {
-  const res = await fetch("https://api.brevo.com/v3/contacts", {
+  const res = await fetch("/api/subscribe", {
     method: "POST",
-    headers: {
-      "api-key": BREVO_API_KEY,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      attributes: { FIRSTNAME: name },
-      listIds: [BREVO_LIST_ID],
-      updateEnabled: true,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email }),
   });
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
