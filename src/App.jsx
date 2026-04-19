@@ -72,8 +72,10 @@ function PrimaryButton({ children, onClick, size = "md" }) {
   );
 }
 
-function SecondaryButton({ children, onClick }) {
+function SecondaryButton({ children, onClick, variant = "dark" }) {
   const [hover, setHover] = useState(false);
+  const baseColor = variant === "light" ? tokens.white : tokens.primary;
+  const hoverColor = variant === "light" ? tokens.primaryOff : tokens.primarySubtle;
   return (
     <button
       onClick={onClick}
@@ -81,12 +83,12 @@ function SecondaryButton({ children, onClick }) {
       onMouseLeave={() => setHover(false)}
       style={{
         backgroundColor: "transparent",
-        color: hover ? tokens.primarySubtle : tokens.primary,
+        color: hover ? hoverColor : baseColor,
         padding: "12px 24px",
         fontSize: 15,
         fontWeight: 700,
         fontFamily: "'Manrope', sans-serif",
-        border: `2px solid ${hover ? tokens.primarySubtle : tokens.primary}`,
+        border: `2px solid ${hover ? hoverColor : baseColor}`,
         borderRadius: 8,
         cursor: "pointer",
         transition: "all 0.2s",
@@ -421,7 +423,7 @@ function Hero({ onSignup }) {
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
-          <SecondaryButton>Ver contenidos</SecondaryButton>
+          <SecondaryButton variant="light" onClick={() => document.getElementById("contenidos").scrollIntoView({ behavior: "smooth" })}>Ver contenidos</SecondaryButton>
         </div>
         <div style={{
           marginTop: 56,
