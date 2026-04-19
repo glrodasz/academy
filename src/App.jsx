@@ -595,7 +595,7 @@ function CurriculumSection() {
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <Badge>Programa</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 8px", color: tokens.primary }}>
-          📚 Contenidos
+          <span aria-hidden="true">📚 </span>Contenidos
         </h2>
         <p style={{ fontSize: 17, color: tokens.neutralPrincipal, marginBottom: 40, lineHeight: 1.6 }}>
           De cero a Full-stack en 16 semanas con un currículo estructurado y progresivo.
@@ -697,7 +697,7 @@ function InstructorSection() {
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
           <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em", margin: "12px 0 8px", color: tokens.primary }}>
-            🎓 Guillermo Rodas
+            <span aria-hidden="true">🎓 </span>Guillermo Rodas
           </h2>
           <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.neutralPrincipal, marginBottom: 20 }}>
             Desarrollador Full-stack en JavaScript de Colombia viviendo en Suecia.
@@ -752,7 +752,7 @@ function TestimonialsSection() {
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
         <Badge>Testimonios</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 48px", color: tokens.white }}>
-          🌟 Lo que dicen los estudiantes
+          <span aria-hidden="true">🌟 </span>Lo que dicen los estudiantes
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
           {TESTIMONIALS.map(({ name, handle, role, quote, image }) => (
@@ -810,7 +810,7 @@ function FAQSection() {
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <Badge>Preguntas frecuentes</Badge>
         <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 40px", color: tokens.primary }}>
-          🙋 FAQ
+          <span aria-hidden="true">🙋 </span>FAQ
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {FAQ_ITEMS.map(({ q, a }, i) => (
