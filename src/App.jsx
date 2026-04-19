@@ -295,22 +295,139 @@ function Hero() {
 }
 
 const WEEKS = [
-  { week: 1, title: "Terminal, Markdown, Git & HTML/CSS fundamentals" },
-  { week: 2, title: "Programación, JavaScript 101, HTML semántico & DOM" },
-  { week: 3, title: "Flexbox, CSS Grid, Responsive Design & Frameworks de UI" },
-  { week: 4, title: "Librerías JS, SASS & Design Tokens" },
-  { week: 5, title: "ES2015+, Programación asíncrona & JS Avanzado" },
-  { week: 6, title: "JS en producción, Introducción a React & Hooks" },
-  { week: 7, title: "Redux & Creación de apps con React / Next.js" },
-  { week: 8, title: "Node.js, Express.js & MongoDB" },
-  { week: 9, title: "Bases de datos SQL & PostgreSQL" },
-  { week: 10, title: "Creando APIs REST" },
-  { week: 11, title: "Autenticación, OAuth 2.0 & Auth0" },
-  { week: 12, title: "Seguridad Web" },
-  { week: 13, title: "Servidores: Linux, SSH, Digital Ocean & Vercel" },
-  { week: 14, title: "CSS Avanzado: Tipografía, Animaciones & Design Systems" },
-  { week: 15, title: "Testing: Unit, Snapshot, Mocking & E2E" },
-  { week: 16, title: "Docker, Kubernetes & CI/CD" },
+  {
+    week: 1,
+    title: "Terminal, Markdown, Git & HTML/CSS fundamentals",
+    topics: [
+      { name: "Configuración del ambiente de desarrollo (Prework)", items: ["Instalando Ubuntu en Windows 10/11", "Instalación de Git", "Configuración de las llaves SSH", "Creando una cuenta de GitHub", "Instalación de Node.js y Yarn", "Primeros pasos con VS Code"] },
+      { name: "El mundo del Markdown", items: ["Sintaxis básica de Markdown", "Sintaxis saborizada en GitHub"] },
+      { name: "Uso básico de la Terminal", items: ["Conociendo la terminal", "Comandos alias para la terminal"] },
+      { name: "Git: Control de versiones", items: ["Cómo crear un repositorio local y hacer tu primer commit", "Las ramas y el uso de merge en git", "Entendiendo cómo funciona git rebase", "Git y los repositorios remotos"] },
+      { name: "Introducción a HTML", items: ["Estructura básica de una página web", "Hiperlinks y media en HTML"] },
+      { name: "Introducción a CSS", items: ["Las hojas de estilos, propiedades y unidades en CSS", "Modelo de caja en CSS", "Cómo funcionan los selectores en CSS", "Práctica de selectores en CSS", "Cómo funciona el layout en CSS", "Cascada y especificidad en CSS"] },
+    ],
+  },
+  {
+    week: 2,
+    title: "Programación, JavaScript 101, HTML semántico & DOM",
+    topics: [
+      { name: "Introducción a la programación", items: ["¿Qué es el código y los algoritmos?", "Sentencias y Expresiones en los lenguajes", "¿Qué son los operadores en programación?", "Valores y tipos en el código", "Lenguajes interpretados y Compilados"] },
+      { name: "JavaScript 101", items: ["Tipos y valores en JavaScript", "JavaScript y sus variables var, let y const", "Igualdades en JavaScript", "Falsy, Truthy y Nullish en JavaScript", "Objetos y sus propiedades en JavaScript", "Funciones puras y mutación en JavaScript", "Los operadores lógicos en JavaScript", "Condicionales y ciclos en JavaScript", "El alcance en JavaScript"] },
+      { name: "HTML Semántico", items: ["El esquema del documento en HTML", "Artículos y secciones ¿Cuál usar y porque?", "nav, header, footer y aside en HTML", "¿Para qué usar divs en HTML?", "time y address en HTML", "Los tags figure, figcaption, picture e img"] },
+      { name: "Formularios con HTML", items: ["Los forms clásicos en HTML", "inputs en los formularios de HTML", "Estilos para formularios en HTML", "Diferencia entre enlaces y botones", "Estilos para tus botones de HTML", "Controles modernos para formularios"] },
+      { name: "JSON, DOM y CSSOM", items: ["El formato JSON", "¿Qué es el DOM?", "¿Qué es el CSSOM?"] },
+    ],
+  },
+  {
+    week: 3,
+    title: "Flexbox, CSS Grid, Responsive Design & Frameworks de UI",
+    topics: [
+      { name: "Flexbox y CSS Responsive", items: ["¿Cómo funciona Flexbox?", "¿Como funciona CSS Grid?", "Cómo usar Flexbox y CSS Grid en conjunto", "Layouts modernas con Flexbox y CSS Grid", "Posicionamiento con CSS", "¿Qué es el Responsive Design?", "Cómo hacer imágenes responsive"] },
+      { name: "Estructura moderna de un proyecto", items: ["Breve historia del bundling y el tooling en JavaScript", "Webpack y cómo cambió el modo de desarrollar", "Vite cómo alternativa a Webpack"] },
+      { name: "Frameworks de UI", items: ["Introducción a Bootstrap 5", "Introducción a Tailwind CSS"] },
+    ],
+  },
+  {
+    week: 4,
+    title: "Librerías JS, SASS & Design Tokens",
+    topics: [
+      { name: "Librerías de Javascript", items: ["Introducción a Lodash", "Introducción a Day.js", "JavaScript Vanilla: sin Lodash o Day.js"] },
+      { name: "CSS en la práctica", items: ["Extendiendo CSS mediante SASS", "Evolución de las Arquitecturas de CSS", "Design Tokens con CSS Custom properties"] },
+    ],
+  },
+  {
+    week: 5,
+    title: "ES2015+, Programación asíncrona & JS Avanzado",
+    topics: [
+      { name: "ES2015 y más allá", items: ["Template literals y la interpolación de Strings", "Diferencia de Rest parameters y Spread operator", "El ABC del destructuring en JavaScript", "La verdad sobre las arrow functions", "Map, Set, WeakMap y Weak Set", "Los for y el protocolo de Iteración", "Métodos en Array, Number, Object, Boolean, String y Math", "Encadenamiento opcional y operador nullish coalescing"] },
+      { name: "Programación asíncrona", items: ["Callbacks y el infierno de los callbacks", "Las promesas de JavaScript", "Los generadores en Javascript", "Async / Await en JavaScript"] },
+      { name: "JavaScript Avanzado", items: ["Herencia clásica versus herencia de prototipos", "Closures y el significado de \"this\"", "Programación funcional en JavaScript", "Aprende a usar Regex en tu día a día"] },
+    ],
+  },
+  {
+    week: 6,
+    title: "JS en producción, Introducción a React & Hooks",
+    topics: [
+      { name: "JavaScript en producción", items: ["¿Qué son los Shim y Polyfills?", "Cómo usar correctamente Babel", "Minificación del código para producción", "Uso efectivo de los Source maps", "Code Splitting y eliminación del código no usado"] },
+      { name: "Introducción a React", items: ["Introducción a React: JSX, Props, Children y Estado", "Ciclo de vida moderno en React", "Eventos y Formularios en React"] },
+      { name: "React avanzado", items: ["Componentes de orden alto en React", "Patrón Render Props", "Todo sobre Hooks en React"] },
+    ],
+  },
+  {
+    week: 7,
+    title: "Redux & Creación de apps con React / Next.js",
+    topics: [
+      { name: "Manejo de estado con Redux", items: ["Redux: Acciones, Reducers, Store y Flujo de datos", "Acciones asíncronas y middlewares en Redux", "Mejora tu arquitectura con React Redux", "useRedux al rescate"] },
+      { name: "Creando apps con React", items: ["Creando un dashboard con Create React App", "Creando un dashboard con Next.js"] },
+    ],
+  },
+  {
+    week: 8,
+    title: "Node.js, Express.js & MongoDB",
+    topics: [
+      { name: "Introducción a Node.js", items: ["¿Qué puedo hacer con Node.js?", "Diferencias entre Node.js y JavaScript"] },
+      { name: "Introducción a Express.js", items: ["Crea un servidor con Express.js", "Todo sobre Middlewares en Express.js"] },
+      { name: "Bases de datos NoSQL", items: ["Introducción a MongoDB", "¿Cómo conectarse a MongoDB desde Node.js?", "Las ventajas de usar Mongoose"] },
+    ],
+  },
+  {
+    week: 9,
+    title: "Bases de datos SQL & PostgreSQL",
+    topics: [
+      { name: "Bases de datos SQL", items: ["¿Qué es el diagrama entidad-relación?", "¿Cómo conectarse a PostgreSQL desde Node.js?", "Consultas esenciales en PostgreSQL"] },
+    ],
+  },
+  {
+    week: 10,
+    title: "Creando APIs REST",
+    topics: [
+      { name: "Creando una API", items: ["Creando una API con Express.js", "Creando una API con Hapi.js", "Creando una API con Sails.js", "Usando Firebase cómo API"] },
+    ],
+  },
+  {
+    week: 11,
+    title: "Autenticación, OAuth 2.0 & Auth0",
+    topics: [
+      { name: "Autenticación y usuarios", items: ["Autenticación con Passport.js", "¿Cómo funciona OAuth 2.0?", "Usando Auth0 para nuestros MVP"] },
+    ],
+  },
+  {
+    week: 12,
+    title: "Seguridad Web",
+    topics: [
+      { name: "Introducción a la seguridad Web", items: ["¿Que es injection y cómo evitarlo?", "¿Cómo implementar autenticación de manera correcta?", "¿Cómo evitar exponer datos sensibles en tus apps?", "Acceso, permisos y correcta configuración en un servidor"] },
+    ],
+  },
+  {
+    week: 13,
+    title: "Servidores: Linux, SSH, Digital Ocean & Vercel",
+    topics: [
+      { name: "Introducción a los servidores", items: ["Permisos de usuarios y sistema de archivos", "Conexión SSH a un servidor remoto", "Manejo esencial de VIM"] },
+      { name: "Servidores como servicio", items: ["Mi primer servidor en Digital Ocean", "Cómo despliego mi app en Fly.io", "Despliega más rápido con Vercel"] },
+    ],
+  },
+  {
+    week: 14,
+    title: "CSS Avanzado: Tipografía, Animaciones & Design Systems",
+    topics: [
+      { name: "CSS Avanzado", items: ["Todo sobre tipografía en CSS", "Transiciones y Animaciones en CSS", "Sistemas de Diseño con CSS"] },
+    ],
+  },
+  {
+    week: 15,
+    title: "Testing: Unit, Snapshot, Mocking & E2E",
+    topics: [
+      { name: "El mundo del testing", items: ["Los principios del testing", "Unit testing en nuestras apps", "Snapshot testing en React", "Cómo hacer buen mocking con los tests", "¿Qué son los tests funcionales o de integración?", "Tests de integración completa (E2E)"] },
+    ],
+  },
+  {
+    week: 16,
+    title: "Docker, Kubernetes & CI/CD",
+    topics: [
+      { name: "Contenedores", items: ["Introducción a los contenedores", "Instalando y configurando Docker", "Introducción a Kubernetes", "Usando Kubernetes con Google Cloud Platform"] },
+      { name: "Integración Continua", items: ["Integración continua y despliegue continuo", "Configura tu ambiente de Integración continua"] },
+    ],
+  },
 ];
 
 function CurriculumSection() {
@@ -327,7 +444,7 @@ function CurriculumSection() {
           De cero a Full-stack en 16 semanas con un currículo estructurado y progresivo.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {WEEKS.map(({ week, title }) => (
+          {WEEKS.map(({ week, title, topics }) => (
             <div
               key={week}
               onClick={() => setOpen(open === week ? null : week)}
@@ -338,28 +455,62 @@ function CurriculumSection() {
                 padding: "16px 20px",
                 cursor: "pointer",
                 display: "flex",
-                alignItems: "center",
-                gap: 16,
+                flexDirection: "column",
+                gap: 0,
                 transition: "border-color 0.2s",
               }}
             >
-              <span style={{
-                minWidth: 36,
-                height: 36,
-                borderRadius: "50%",
-                backgroundColor: open === week ? tokens.primary : tokens.primaryOff,
-                color: open === week ? tokens.accent : tokens.primarySubtle,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 13,
-                fontWeight: 800,
-                transition: "all 0.2s",
-              }}>
-                {week}
-              </span>
-              <span style={{ fontWeight: 600, fontSize: 15, color: tokens.primary, flex: 1 }}>{title}</span>
-              <span style={{ color: tokens.neutralMid, fontSize: 18, fontWeight: 300 }}>{open === week ? "−" : "+"}</span>
+              {/* Header row */}
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <span style={{
+                  minWidth: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  backgroundColor: open === week ? tokens.primary : tokens.primaryOff,
+                  color: open === week ? tokens.accent : tokens.primarySubtle,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 13,
+                  fontWeight: 800,
+                  transition: "all 0.2s",
+                  flexShrink: 0,
+                }}>
+                  {week}
+                </span>
+                <span style={{ fontWeight: 600, fontSize: 15, color: tokens.primary, flex: 1 }}>{title}</span>
+                <span style={{ color: tokens.neutralMid, fontSize: 18, fontWeight: 300 }}>{open === week ? "−" : "+"}</span>
+              </div>
+
+              {/* Expanded content */}
+              {open === week && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    marginTop: 16,
+                    paddingTop: 16,
+                    borderTop: `1px solid ${tokens.neutralMid}`,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16,
+                  }}
+                >
+                  {topics.map(({ name, items }) => (
+                    <div key={name}>
+                      <div style={{ fontWeight: 700, fontSize: 13, color: tokens.primary, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        {name}
+                      </div>
+                      <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 3 }}>
+                        {items.map((item) => (
+                          <li key={item} style={{ fontSize: 14, color: tokens.neutralPrincipal, lineHeight: 1.5 }}>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
