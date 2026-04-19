@@ -680,15 +680,15 @@ function InstructorSection() {
           width: 180,
           height: 180,
           borderRadius: "50%",
-          backgroundColor: tokens.primaryOff,
           border: `4px solid ${tokens.accent}`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 64,
           flexShrink: 0,
+          overflow: "hidden",
         }}>
-          🧑‍💻
+          <img
+            src="/images/guillermo.png"
+            alt="Guillermo Rodas"
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          />
         </div>
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
@@ -724,21 +724,21 @@ const TESTIMONIALS = [
     handle: "@teffcode",
     role: "Sr. Frontend Dev",
     quote: "Gracias a Guille y a sus enseñanzas en el Bootcamp, me enamoré del desarrollo web. Conoce el por qué de cada cosa y la explica de una manera increíble.",
-    emoji: "👩‍💻",
+    image: "/images/estefany.jpg",
   },
   {
     name: "Carlos Azaustre",
     handle: "@carlosazaustre",
     role: "Google Dev Expert",
     quote: "Guillermo es un auténtico todoterreno. No solo domina Frontend y Backend, además las explica de forma natural y sencilla.",
-    emoji: "🧑‍🎤",
+    image: "/images/carlos.jpg",
   },
   {
     name: "Juan Garces",
     handle: "@juangarcesme",
     role: "Sr. Product Designer",
     quote: "Una de las cosas que más admiro de él es la forma en que puede transformar un tema complejo en un mensaje claro y fácil de entender.",
-    emoji: "🎨",
+    image: "/images/juan.jpg",
   },
 ];
 
@@ -751,14 +751,22 @@ function TestimonialsSection() {
           🌟 Lo que dicen los estudiantes
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
-          {TESTIMONIALS.map(({ name, handle, role, quote, emoji }) => (
+          {TESTIMONIALS.map(({ name, handle, role, quote, image }) => (
             <div key={name} style={{
               backgroundColor: "#ffffff0f",
               border: "1px solid #ffffff18",
               borderRadius: 14,
               padding: 28,
             }}>
-              <div style={{ fontSize: 36, marginBottom: 16 }}>{emoji}</div>
+              <img src={image} alt={name} style={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                objectFit: "cover",
+                display: "block",
+                marginBottom: 16,
+                border: `2px solid ${tokens.accent}`,
+              }} />
               <p style={{
                 fontSize: 15,
                 lineHeight: 1.7,
