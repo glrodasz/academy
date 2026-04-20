@@ -39,6 +39,16 @@ button {
   .nav-hamburger {
     display: flex !important;
   }
+
+  .hero-cta-buttons {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .hero-cta-buttons > button {
+    width: 100%;
+    padding: 16px 36px !important;
+    font-size: 17px !important;
+  }
 }
 
 @media (min-width: 641px) {
