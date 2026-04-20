@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="10" fill="#0a0a0a"/>
+  <text font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" dominant-baseline="central" y="33">
+    <tspan
+      x="6"
+      fill="#ffffff"
+      stroke="#000"
+      stroke-width="2"
+      paint-order="stroke fill"
+    >u</tspan><tspan
+      fill="#b5ff4d"
+      stroke="#000"
+      stroke-width="2"
+      paint-order="stroke fill"
+    >a</tspan>
+  </text>
+</svg>
