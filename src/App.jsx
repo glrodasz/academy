@@ -85,6 +85,35 @@ function PrimaryButton({ children, onClick, size = "md" }) {
   );
 }
 
+function SubmitAccentButton({ children, disabled }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        backgroundColor: disabled ? tokens.textMuted : hover ? "#c8ff6e" : tokens.accent,
+        color: tokens.accentFg,
+        padding: "16px 36px",
+        fontSize: 17,
+        fontWeight: 700,
+        fontFamily: "'Space Grotesk', sans-serif",
+        border: "none",
+        borderRadius: 4,
+        cursor: disabled ? "not-allowed" : "pointer",
+        transition: "background-color 0.2s",
+        letterSpacing: "0.01em",
+        marginTop: 4,
+        opacity: disabled ? 0.85 : 1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function SecondaryButton({ children, onClick, variant = "dark" }) {
   const [hover, setHover] = useState(false);
   const baseColor = variant === "light" ? tokens.white : tokens.textDark;
@@ -147,11 +176,19 @@ function SignupModal({ onClose }) {
     padding: "12px 14px",
     fontSize: 15,
     fontFamily: "'Inter', sans-serif",
-    border: `1.5px solid ${tokens.borderLight}`,
+    border: `1.5px solid ${tokens.border}`,
     borderRadius: 4,
     outline: "none",
-    color: tokens.textDark,
+    color: tokens.white,
+    backgroundColor: "#1C2433",
     boxSizing: "border-box",
+  };
+
+  const linkStyle = {
+    color: tokens.accent,
+    fontWeight: 600,
+    textDecoration: "none",
+    borderBottom: `1px solid ${tokens.accent}`,
   };
 
   return (
@@ -171,8 +208,11 @@ function SignupModal({ onClose }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          backgroundColor: tokens.white,
+          backgroundColor: tokens.bgSurface,
           borderRadius: 4,
+          border: `1px solid ${tokens.border}`,
+          borderLeft: `4px solid ${tokens.accent}`,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
           padding: "40px 36px",
           width: "100%",
           maxWidth: 420,
@@ -199,31 +239,89 @@ function SignupModal({ onClose }) {
         </button>
 
         {status === "success" ? (
-          <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.textDark, margin: "0 0 16px" }}>
-              🎉 Gracias
+          <div style={{ padding: "8px 0 0", textAlign: "left" }}>
+            <h3 style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "clamp(26px, 6vw, 34px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              margin: "0 0 20px",
+              color: tokens.white,
+            }}>
+              <span aria-hidden="true" style={{ marginRight: 8 }}>🎉</span>
+              <span style={{ color: tokens.accent }}>Gracias</span>
             </h3>
-            <p style={{ fontSize: 15, color: tokens.textDark, lineHeight: 1.8, textAlign: "left" }}>
-              ✅ ¿Qué más debo hacer?
+            <p style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: tokens.textMuted,
+              margin: "0 0 12px",
+            }}>
+              ¿Qué más debo hacer?
             </p>
-            <ol style={{ fontSize: 15, color: tokens.textDark, lineHeight: 1.8, textAlign: "left", paddingLeft: 20, margin: "8px 0 16px" }}>
-              <li>Accede al Discord: <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={{ color: tokens.textDark }}>https://undf.sh/discord</a></li>
-              <li>Empieza aquí: <a href="https://undf.sh/empezar" target="_blank" rel="noopener noreferrer" style={{ color: tokens.textDark }}>https://undf.sh/empezar</a></li>
+            <ol style={{
+              fontSize: 15,
+              color: tokens.white,
+              lineHeight: 1.75,
+              paddingLeft: 22,
+              margin: "0 0 24px",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              <li style={{ marginBottom: 10 }}>
+                Accede al Discord:{" "}
+                <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                  https://undf.sh/discord
+                </a>
+              </li>
+              <li>
+                Empieza aquí:{" "}
+                <a href="https://undf.sh/empezar" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                  https://undf.sh/empezar
+                </a>
+              </li>
             </ol>
-            <p style={{ fontSize: 13, color: tokens.textDark, lineHeight: 1.6, marginBottom: 12 }}>
-              ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
-            </p>
-            <p style={{ fontSize: 13, color: tokens.textDark, lineHeight: 1.6 }}>
-              🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
-            </p>
+            <div style={{
+              borderTop: `1px solid ${tokens.border}`,
+              paddingTop: 20,
+              marginTop: 4,
+            }}>
+              <p style={{
+                fontSize: 12,
+                color: tokens.textMuted,
+                lineHeight: 1.65,
+                margin: "0 0 14px",
+                textAlign: "left",
+              }}>
+                ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
+              </p>
+              <p style={{
+                fontSize: 12,
+                color: tokens.textMuted,
+                lineHeight: 1.65,
+                margin: 0,
+                textAlign: "left",
+              }}>
+                🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
+              </p>
+            </div>
           </div>
         ) : (
           <>
-            <Badge variant="light">Bootcamp gratuito</Badge>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.textDark, margin: "12px 0 4px" }}>
+            <Badge>Bootcamp gratuito</Badge>
+            <h3 style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 24,
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              color: tokens.white,
+              margin: "12px 0 6px",
+            }}>
               Inscríbete al bootcamp
             </h3>
-            <p style={{ fontSize: 14, color: tokens.textDark, marginBottom: 24, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, color: tokens.textMuted, marginBottom: 24, lineHeight: 1.5 }}>
               16 semanas · Full-stack JavaScript · 100% gratis
             </p>
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -233,6 +331,7 @@ function SignupModal({ onClose }) {
                 placeholder="Tu nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="signup-modal-input"
                 style={inputStyle}
               />
               <input
@@ -241,30 +340,15 @@ function SignupModal({ onClose }) {
                 placeholder="Tu correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="signup-modal-input"
                 style={inputStyle}
               />
               {status === "error" && (
-                <p style={{ fontSize: 13, color: "#c0392b", margin: 0 }}>{errorMsg}</p>
+                <p style={{ fontSize: 13, color: "#ff6b6b", margin: 0 }}>{errorMsg}</p>
               )}
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                style={{
-                  backgroundColor: status === "loading" ? tokens.textMuted : tokens.textDark,
-                  color: tokens.white,
-                  padding: "14px",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  border: "none",
-                  borderRadius: 4,
-                  cursor: status === "loading" ? "not-allowed" : "pointer",
-                  transition: "background-color 0.2s",
-                  marginTop: 4,
-                }}
-              >
+              <SubmitAccentButton disabled={status === "loading"}>
                 {status === "loading" ? "Enviando…" : "Inscribirse gratis →"}
-              </button>
+              </SubmitAccentButton>
             </form>
           </>
         )}

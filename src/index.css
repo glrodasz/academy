@@ -22,6 +22,10 @@ button {
   font-family: inherit;
 }
 
+.signup-modal-input::placeholder {
+  color: #7A8799;
+}
+
 #root {
   width: 100%;
 }
