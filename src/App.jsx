@@ -187,12 +187,21 @@ function SignupModal({ onClose }) {
 
         {status === "success" ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🎉</div>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "0 0 8px" }}>
-              ¡Ya estás inscrito/a!
+            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "0 0 16px" }}>
+              🎉 Gracias
             </h3>
-            <p style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.6 }}>
-              Revisa tu correo para los próximos pasos.
+            <p style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.8, textAlign: "left" }}>
+              ✅ ¿Qué más debo hacer?
+            </p>
+            <ol style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.8, textAlign: "left", paddingLeft: 20, margin: "8px 0 16px" }}>
+              <li>Accede al Discord: <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>https://undf.sh/discord</a></li>
+              <li>Empieza aquí: <a href="https://undf.sh/empezar" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>https://undf.sh/empezar</a></li>
+            </ol>
+            <p style={{ fontSize: 13, color: tokens.neutralPrincipal, lineHeight: 1.6, marginBottom: 12 }}>
+              ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
+            </p>
+            <p style={{ fontSize: 13, color: tokens.neutralPrincipal, lineHeight: 1.6 }}>
+              🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
             </p>
           </div>
         ) : (
