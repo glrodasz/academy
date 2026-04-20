@@ -546,7 +546,7 @@ function Hero({ onSignup }) {
         }}>
           16 semanas de formación intensiva en JavaScript — completamente gratis y 100% online.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="hero-cta-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
           <SecondaryButton variant="light" onClick={() => document.getElementById("contenidos").scrollIntoView({ behavior: "smooth" })}>Ver contenidos</SecondaryButton>
         </div>

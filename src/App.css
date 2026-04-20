@@ -182,3 +182,16 @@
     border-right-color: var(--border);
   }
 }
+
+@media (max-width: 640px) {
+  .hero-cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hero-cta-buttons > button {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px 36px !important;
+    font-size: 17px !important;
+  }
+}
