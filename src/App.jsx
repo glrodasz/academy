@@ -1,43 +1,56 @@
 import { useState } from "react";
 
 
-// Quantum Design System — Mint Blue theme
-// System tokens remapped: Prussian Blue (Primary) + Mint (Complementary)
+// Quantum Design System — Bold Editorial (Dark-first, Lime Accent)
 const tokens = {
-  primary: "#003049",
-  primarySubtle: "#0092E0",
-  primaryOff: "#EBF8FF",
-  accent: "#52B788",
-  neutralPrincipal: "#454545",
-  neutralOff: "#F6F6F6",
-  neutralMid: "#C8C8C8",
-  white: "#FFFFFF",
+  bg:          "#0D1117",
+  bgSurface:   "#161B24",
+  bgLight:     "#F2F5F8",
+  accent:      "#B5FF4D",
+  accentFg:    "#0D1117",
+  text:        "#FFFFFF",
+  textMuted:   "#7A8799",
+  textDark:    "#111827",
+  border:      "#1E2A3A",
+  borderLight: "#E2E8F0",
+  white:       "#FFFFFF",
 };
 
 const styles = {
   global: {
-    fontFamily: "'Manrope', sans-serif",
-    color: tokens.neutralPrincipal,
-    backgroundColor: tokens.white,
+    fontFamily: "'Inter', sans-serif",
+    color: tokens.textDark,
+    backgroundColor: tokens.bg,
     margin: 0,
     padding: 0,
   },
 };
 
+/** Hero SVG pattern (same path as classic Hero Patterns tile); colors from tokens */
+const HERO_PATTERN_PATH_D = "M44.1 224a5 5 0 1 1 0 2H0v-2h44.1zm160 48a5 5 0 1 1 0 2H82v-2h122.1zm57.8-46a5 5 0 1 1 0-2H304v2h-42.1zm0 16a5 5 0 1 1 0-2H304v2h-42.1zm6.2-114a5 5 0 1 1 0 2h-86.2a5 5 0 1 1 0-2h86.2zm-256-48a5 5 0 1 1 0 2H0v-2h12.1zm185.8 34a5 5 0 1 1 0-2h86.2a5 5 0 1 1 0 2h-86.2zM258 12.1a5 5 0 1 1-2 0V0h2v12.1zm-64 208a5 5 0 1 1-2 0v-54.2a5 5 0 1 1 2 0v54.2zm48-198.2V80h62v2h-64V21.9a5 5 0 1 1 2 0zm16 16V64h46v2h-48V37.9a5 5 0 1 1 2 0zm-128 96V208h16v12.1a5 5 0 1 1-2 0V210h-16v-76.1a5 5 0 1 1 2 0zm-5.9-21.9a5 5 0 1 1 0 2H114v48H85.9a5 5 0 1 1 0-2H112v-48h12.1zm-6.2 130a5 5 0 1 1 0-2H176v-74.1a5 5 0 1 1 2 0V242h-60.1zm-16-64a5 5 0 1 1 0-2H114v48h10.1a5 5 0 1 1 0 2H112v-48h-10.1zM66 284.1a5 5 0 1 1-2 0V274H50v30h-2v-32h18v12.1zM236.1 176a5 5 0 1 1 0 2H226v94h48v32h-2v-30h-48v-98h12.1zm25.8-30a5 5 0 1 1 0-2H274v44.1a5 5 0 1 1-2 0V146h-10.1zm-64 96a5 5 0 1 1 0-2H208v-80h16v-14h-42.1a5 5 0 1 1 0-2H226v18h-16v80h-12.1zm86.2-210a5 5 0 1 1 0 2H272V0h2v32h10.1zM98 101.9V146H53.9a5 5 0 1 1 0-2H96v-42.1a5 5 0 1 1 2 0zM53.9 34a5 5 0 1 1 0-2H80V0h2v34H53.9zm60.1 3.9V66H82v64H69.9a5 5 0 1 1 0-2H80V64h32V37.9a5 5 0 1 1 2 0zM101.9 82a5 5 0 1 1 0-2H128V37.9a5 5 0 1 1 2 0V82h-28.1zm16-64a5 5 0 1 1 0-2H146v44.1a5 5 0 1 1-2 0V18h-26.1zm102.2 270a5 5 0 1 1 0 2H98v14h-2v-16h124.1zM242 149.9V160h16v34h-16v62h48v48h-2v-46h-48v-66h16v-30h-16v-12.1a5 5 0 1 1 2 0zM53.9 18a5 5 0 1 1 0-2H64V2H48V0h18v18H53.9zm112 32a5 5 0 1 1 0-2H192V0h50v2h-48v48h-28.1zm-48-48a5 5 0 0 1-9.8-2h2.07a3 3 0 1 0 5.66 0H178v34h-18V21.9a5 5 0 1 1 2 0V32h14V2h-58.1zm0 96a5 5 0 1 1 0-2H137l32-32h39V21.9a5 5 0 1 1 2 0V66h-40.17l-32 32H117.9zm28.1 90.1a5 5 0 1 1-2 0v-76.51L175.59 80H224V21.9a5 5 0 1 1 2 0V82h-49.59L146 112.41v75.69zm16 32a5 5 0 1 1-2 0v-99.51L184.59 96H300.1a5 5 0 0 1 3.9-3.9v2.07a3 3 0 0 0 0 5.66v2.07a5 5 0 0 1-3.9-3.9H185.41L162 121.41v98.69zm-144-64a5 5 0 1 1-2 0v-3.51l48-48V48h32V0h2v50H66v55.41l-48 48v2.69zM50 53.9v43.51l-48 48V208h26.1a5 5 0 1 1 0 2H0v-65.41l48-48V53.9a5 5 0 1 1 2 0zm-16 16V89.41l-34 34v-2.82l32-32V69.9a5 5 0 1 1 2 0zM12.1 32a5 5 0 1 1 0 2H9.41L0 43.41V40.6L8.59 32h3.51zm265.8 18a5 5 0 1 1 0-2h18.69l7.41-7.41v2.82L297.41 50H277.9zm-16 160a5 5 0 1 1 0-2H288v-71.41l16-16v2.82l-14 14V210h-28.1zm-208 32a5 5 0 1 1 0-2H64v-22.59L40.59 194H21.9a5 5 0 1 1 0-2H41.41L66 216.59V242H53.9zm150.2 14a5 5 0 1 1 0 2H96v-56.6L56.6 162H37.9a5 5 0 1 1 0-2h19.5L98 200.6V256h106.1zm-150.2 2a5 5 0 1 1 0-2H80v-46.59L48.59 178H21.9a5 5 0 1 1 0-2H49.41L82 208.59V258H53.9zM34 39.8v1.61L9.41 66H0v-2h8.59L32 40.59V0h2v39.8zM2 300.1a5 5 0 0 1 3.9 3.9H3.83A3 3 0 0 0 0 302.17V256h18v48h-2v-46H2v42.1zM34 241v63h-2v-62H0v-2h34v1zM17 18H0v-2h16V0h2v18h-1zm273-2h14v2h-16V0h2v16zm-32 273v15h-2v-14h-14v14h-2v-16h18v1zM0 92.1A5.02 5.02 0 0 1 6 97a5 5 0 0 1-6 4.9v-2.07a3 3 0 1 0 0-5.66V92.1zM80 272h2v32h-2v-32zm37.9 32h-2.07a3 3 0 0 0-5.66 0h-2.07a5 5 0 0 1 9.8 0zM5.9 0A5.02 5.02 0 0 1 0 5.9V3.83A3 3 0 0 0 3.83 0H5.9zm294.2 0h2.07A3 3 0 0 0 304 3.83V5.9a5 5 0 0 1-3.9-5.9zm3.9 300.1v2.07a3 3 0 0 0-1.83 1.83h-2.07a5 5 0 0 1 3.9-3.9zM97 100a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-48 32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32 48a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16-64a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 96a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-144a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-96 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm96 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16-64a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-32 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM49 36a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-32 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM33 68a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-48a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 240a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16-64a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm80-176a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32 48a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm112 176a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-16 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 180a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0-32a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 84a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm32 64a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm16-16a3 3 0 1 0 0-6 3 3 0 0 0 0 6z";
+
+function heroPatternDataUrl({ fill, fillOpacity }) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 304 304" width="304" height="304"><path fill="${fill}" fill-opacity="${fillOpacity}" d="${HERO_PATTERN_PATH_D}"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 // ─── COMPONENTS ───────────────────────────────────────────────
 
-function Badge({ children }) {
+function Badge({ children, variant = "dark" }) {
+  const isLight = variant === "light";
   return (
     <span style={{
       display: "inline-block",
-      backgroundColor: tokens.accent,
-      color: tokens.primary,
+      backgroundColor: isLight ? tokens.textDark : "transparent",
+      color: isLight ? tokens.white : tokens.accent,
+      border: isLight ? "none" : `1px solid ${tokens.accent}`,
       fontSize: 11,
-      fontWeight: 700,
+      fontWeight: 600,
+      fontFamily: "'Space Grotesk', sans-serif",
       letterSpacing: "0.08em",
       textTransform: "uppercase",
       padding: "4px 10px",
-      borderRadius: 4,
+      borderRadius: 2,
     }}>
       {children}
     </span>
@@ -54,14 +67,14 @@ function PrimaryButton({ children, onClick, size = "md" }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        backgroundColor: hover ? "#3d9a6d" : tokens.accent,
-        color: tokens.primary,
+        backgroundColor: hover ? "#c8ff6e" : tokens.accent,
+        color: tokens.accentFg,
         padding,
         fontSize,
         fontWeight: 700,
-        fontFamily: "'Manrope', sans-serif",
+        fontFamily: "'Space Grotesk', sans-serif",
         border: "none",
-        borderRadius: 8,
+        borderRadius: 4,
         cursor: "pointer",
         transition: "background-color 0.2s",
         letterSpacing: "0.01em",
@@ -72,10 +85,39 @@ function PrimaryButton({ children, onClick, size = "md" }) {
   );
 }
 
+function SubmitAccentButton({ children, disabled }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      type="submit"
+      disabled={disabled}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        backgroundColor: disabled ? tokens.textMuted : hover ? "#c8ff6e" : tokens.accent,
+        color: tokens.accentFg,
+        padding: "16px 36px",
+        fontSize: 17,
+        fontWeight: 700,
+        fontFamily: "'Space Grotesk', sans-serif",
+        border: "none",
+        borderRadius: 4,
+        cursor: disabled ? "not-allowed" : "pointer",
+        transition: "background-color 0.2s",
+        letterSpacing: "0.01em",
+        marginTop: 4,
+        opacity: disabled ? 0.85 : 1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function SecondaryButton({ children, onClick, variant = "dark" }) {
   const [hover, setHover] = useState(false);
-  const baseColor = variant === "light" ? tokens.white : tokens.primary;
-  const hoverColor = variant === "light" ? tokens.primaryOff : tokens.primarySubtle;
+  const baseColor = variant === "light" ? tokens.white : tokens.textDark;
+  const hoverColor = tokens.accent;
   return (
     <button
       onClick={onClick}
@@ -87,9 +129,9 @@ function SecondaryButton({ children, onClick, variant = "dark" }) {
         padding: "12px 24px",
         fontSize: 15,
         fontWeight: 700,
-        fontFamily: "'Manrope', sans-serif",
+        fontFamily: "'Space Grotesk', sans-serif",
         border: `2px solid ${hover ? hoverColor : baseColor}`,
-        borderRadius: 8,
+        borderRadius: 4,
         cursor: "pointer",
         transition: "all 0.2s",
       }}
@@ -133,12 +175,20 @@ function SignupModal({ onClose }) {
     width: "100%",
     padding: "12px 14px",
     fontSize: 15,
-    fontFamily: "'Manrope', sans-serif",
-    border: `1.5px solid ${tokens.neutralMid}`,
-    borderRadius: 8,
+    fontFamily: "'Inter', sans-serif",
+    border: `1.5px solid ${tokens.border}`,
+    borderRadius: 4,
     outline: "none",
-    color: tokens.neutralPrincipal,
+    color: tokens.white,
+    backgroundColor: "#1C2433",
     boxSizing: "border-box",
+  };
+
+  const linkStyle = {
+    color: tokens.accent,
+    fontWeight: 600,
+    textDecoration: "none",
+    borderBottom: `1px solid ${tokens.accent}`,
   };
 
   return (
@@ -147,7 +197,7 @@ function SignupModal({ onClose }) {
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(0,0,0,0.5)",
+        backgroundColor: "rgba(0,0,0,0.75)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -158,8 +208,11 @@ function SignupModal({ onClose }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          backgroundColor: tokens.white,
-          borderRadius: 16,
+          backgroundColor: tokens.bgSurface,
+          borderRadius: 4,
+          border: `1px solid ${tokens.border}`,
+          borderLeft: `4px solid ${tokens.accent}`,
+          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
           padding: "40px 36px",
           width: "100%",
           maxWidth: 420,
@@ -178,7 +231,7 @@ function SignupModal({ onClose }) {
             border: "none",
             cursor: "pointer",
             fontSize: 22,
-            color: tokens.neutralMid,
+            color: tokens.textMuted,
             lineHeight: 1,
           }}
         >
@@ -186,31 +239,89 @@ function SignupModal({ onClose }) {
         </button>
 
         {status === "success" ? (
-          <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "0 0 16px" }}>
-              🎉 Gracias
+          <div style={{ padding: "8px 0 0", textAlign: "left" }}>
+            <h3 style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "clamp(26px, 6vw, 34px)",
+              fontWeight: 700,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              margin: "0 0 20px",
+              color: tokens.white,
+            }}>
+              <span aria-hidden="true" style={{ marginRight: 8 }}>🎉</span>
+              <span style={{ color: tokens.accent }}>Gracias</span>
             </h3>
-            <p style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.8, textAlign: "left" }}>
-              ✅ ¿Qué más debo hacer?
+            <p style={{
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: tokens.textMuted,
+              margin: "0 0 12px",
+            }}>
+              ¿Qué más debo hacer?
             </p>
-            <ol style={{ fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.8, textAlign: "left", paddingLeft: 20, margin: "8px 0 16px" }}>
-              <li>Accede al Discord: <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>https://undf.sh/discord</a></li>
-              <li>Empieza aquí: <a href="https://undf.sh/empezar" target="_blank" rel="noopener noreferrer" style={{ color: tokens.primary }}>https://undf.sh/empezar</a></li>
+            <ol style={{
+              fontSize: 15,
+              color: tokens.white,
+              lineHeight: 1.75,
+              paddingLeft: 22,
+              margin: "0 0 24px",
+              fontFamily: "'Inter', sans-serif",
+            }}>
+              <li style={{ marginBottom: 10 }}>
+                Accede al Discord:{" "}
+                <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                  https://undf.sh/discord
+                </a>
+              </li>
+              <li>
+                Empieza aquí:{" "}
+                <a href="https://undf.sh/empezar" target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                  https://undf.sh/empezar
+                </a>
+              </li>
             </ol>
-            <p style={{ fontSize: 13, color: tokens.neutralPrincipal, lineHeight: 1.6, marginBottom: 12 }}>
-              ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
-            </p>
-            <p style={{ fontSize: 13, color: tokens.neutralPrincipal, lineHeight: 1.6 }}>
-              🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
-            </p>
+            <div style={{
+              borderTop: `1px solid ${tokens.border}`,
+              paddingTop: 20,
+              marginTop: 4,
+            }}>
+              <p style={{
+                fontSize: 12,
+                color: tokens.textMuted,
+                lineHeight: 1.65,
+                margin: "0 0 14px",
+                textAlign: "left",
+              }}>
+                ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
+              </p>
+              <p style={{
+                fontSize: 12,
+                color: tokens.textMuted,
+                lineHeight: 1.65,
+                margin: 0,
+                textAlign: "left",
+              }}>
+                🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
+              </p>
+            </div>
           </div>
         ) : (
           <>
             <Badge>Bootcamp gratuito</Badge>
-            <h3 style={{ fontSize: 22, fontWeight: 800, color: tokens.primary, margin: "12px 0 4px" }}>
+            <h3 style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 24,
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              color: tokens.white,
+              margin: "12px 0 6px",
+            }}>
               Inscríbete al bootcamp
             </h3>
-            <p style={{ fontSize: 14, color: tokens.neutralPrincipal, marginBottom: 24, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, color: tokens.textMuted, marginBottom: 24, lineHeight: 1.5 }}>
               16 semanas · Full-stack JavaScript · 100% gratis
             </p>
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -220,6 +331,7 @@ function SignupModal({ onClose }) {
                 placeholder="Tu nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="signup-modal-input"
                 style={inputStyle}
               />
               <input
@@ -228,30 +340,15 @@ function SignupModal({ onClose }) {
                 placeholder="Tu correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="signup-modal-input"
                 style={inputStyle}
               />
               {status === "error" && (
-                <p style={{ fontSize: 13, color: "#c0392b", margin: 0 }}>{errorMsg}</p>
+                <p style={{ fontSize: 13, color: "#ff6b6b", margin: 0 }}>{errorMsg}</p>
               )}
-              <button
-                type="submit"
-                disabled={status === "loading"}
-                style={{
-                  backgroundColor: status === "loading" ? tokens.neutralMid : tokens.primary,
-                  color: tokens.white,
-                  padding: "14px",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  fontFamily: "'Manrope', sans-serif",
-                  border: "none",
-                  borderRadius: 8,
-                  cursor: status === "loading" ? "not-allowed" : "pointer",
-                  transition: "background-color 0.2s",
-                  marginTop: 4,
-                }}
-              >
+              <SubmitAccentButton disabled={status === "loading"}>
                 {status === "loading" ? "Enviando…" : "Inscribirse gratis →"}
-              </button>
+              </SubmitAccentButton>
             </form>
           </>
         )}
@@ -291,6 +388,29 @@ function HamburgerIcon({ open }) {
   );
 }
 
+function NavLink({ href, label, onClick }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <a
+      href={href}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        color: hover ? tokens.white : tokens.textMuted,
+        textDecoration: "none",
+        fontSize: 14,
+        fontWeight: 600,
+        padding: "6px 2px",
+        borderBottom: hover ? `1.5px solid ${tokens.accent}` : "1.5px solid transparent",
+        transition: "color 0.2s, border-color 0.2s",
+      }}
+    >
+      {label}
+    </a>
+  );
+}
+
 function Nav({ onSignup }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = () => setMenuOpen(false);
@@ -300,8 +420,8 @@ function Nav({ onSignup }) {
       position: "sticky",
       top: 0,
       zIndex: 100,
-      backgroundColor: tokens.primary,
-      borderBottom: `3px solid ${tokens.accent}`,
+      backgroundColor: tokens.bg,
+      borderBottom: `1px solid ${tokens.border}`,
     }}>
       {/* Top bar */}
       <div style={{
@@ -314,8 +434,9 @@ function Nav({ onSignup }) {
         <a href="/" style={{ textDecoration: "none" }}>
           <span style={{
             color: tokens.white,
-            fontWeight: 800,
-            fontSize: 20,
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700,
+            fontSize: 24,
             letterSpacing: "-0.02em",
           }}>
             undefined<span style={{ color: tokens.accent }}>.academy</span>
@@ -323,10 +444,9 @@ function Nav({ onSignup }) {
         </a>
 
         {/* Desktop links */}
-        <div style={{ display: "flex", gap: 12, "@media(max-width:640px)": { display: "none" } }}
-          className="nav-desktop-links">
+        <div style={{ display: "flex", gap: 20 }} className="nav-desktop-links">
           {NAV_LINKS.map(({ href, label }) => (
-            <a key={href} href={href} style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>{label}</a>
+            <NavLink key={href} href={href} label={label} />
           ))}
         </div>
 
@@ -355,8 +475,8 @@ function Nav({ onSignup }) {
       {/* Mobile drawer */}
       {menuOpen && (
         <div style={{
-          backgroundColor: tokens.primary,
-          borderTop: `1px solid #ffffff18`,
+          backgroundColor: tokens.bg,
+          borderTop: `1px solid ${tokens.border}`,
           padding: "16px 24px 24px",
           display: "flex",
           flexDirection: "column",
@@ -369,12 +489,12 @@ function Nav({ onSignup }) {
               href={href}
               onClick={close}
               style={{
-                color: tokens.neutralMid,
+                color: tokens.textMuted,
                 textDecoration: "none",
                 fontSize: 16,
                 fontWeight: 600,
                 padding: "12px 0",
-                borderBottom: "1px solid #ffffff10",
+                borderBottom: `1px solid ${tokens.border}`,
               }}
             >
               {label}
@@ -392,30 +512,23 @@ function Nav({ onSignup }) {
 function Hero({ onSignup }) {
   return (
     <section style={{
-      background: `linear-gradient(135deg, ${tokens.primary} 60%, #004a6e 100%)`,
+      backgroundColor: tokens.bg,
+      backgroundImage: heroPatternDataUrl({ fill: tokens.border, fillOpacity: 0.4 }),
+      backgroundRepeat: "repeat",
+      backgroundSize: "304px 304px",
       color: tokens.white,
-      padding: "96px 32px 80px",
+      padding: "120px 32px 100px",
       textAlign: "center",
       position: "relative",
       overflow: "hidden",
     }}>
-      <div style={{
-        position: "absolute",
-        top: -80,
-        right: -80,
-        width: 320,
-        height: 320,
-        borderRadius: "50%",
-        backgroundColor: tokens.accent,
-        opacity: 0.06,
-      }} />
       <div style={{ position: "relative", maxWidth: 720, margin: "0 auto" }}>
         <Badge>Bootcamp · 16 semanas · Gratis</Badge>
         <h1 style={{
-          fontSize: "clamp(42px, 7vw, 72px)",
-          fontWeight: 800,
-          lineHeight: 1.08,
-          letterSpacing: "-0.03em",
+          fontSize: "clamp(56px, 10vw, 104px)",
+          fontWeight: 700,
+          lineHeight: 1.0,
+          letterSpacing: "-0.04em",
           margin: "24px 0 20px",
           color: tokens.white,
         }}>
@@ -425,7 +538,8 @@ function Hero({ onSignup }) {
         <p style={{
           fontSize: 20,
           lineHeight: 1.6,
-          color: tokens.primaryOff,
+          color: tokens.textMuted,
+          fontFamily: "'Inter', sans-serif",
           maxWidth: 520,
           margin: "0 auto 40px",
           fontWeight: 400,
@@ -450,8 +564,22 @@ function Hero({ onSignup }) {
             { value: "Online", label: "En vivo + diferido" },
           ].map(({ value, label }) => (
             <div key={label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 32, fontWeight: 800, color: tokens.accent }}>{value}</div>
-              <div style={{ fontSize: 13, color: tokens.primaryOff, marginTop: 2, fontWeight: 500 }}>{label}</div>
+              <div style={{
+                fontSize: 52,
+                fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif",
+                color: tokens.accent,
+                letterSpacing: "-0.03em",
+                lineHeight: 1,
+              }}>{value}</div>
+              <div style={{
+                fontSize: 12,
+                color: tokens.textMuted,
+                marginTop: 8,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}>{label}</div>
             </div>
           ))}
         </div>
@@ -600,85 +728,111 @@ function CurriculumSection() {
   const [open, setOpen] = useState(null);
 
   return (
-    <section id="contenidos" style={{ padding: "80px 32px", backgroundColor: tokens.neutralOff }}>
+    <section id="contenidos" style={{ padding: "100px 32px", backgroundColor: tokens.bgLight }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
-        <Badge>Programa</Badge>
-        <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 8px", color: tokens.primary }}>
-          <span aria-hidden="true">📚 </span>Contenidos
+        <Badge variant="light">Programa</Badge>
+        <h2 style={{
+          fontSize: 52,
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          margin: "16px 0 8px",
+          color: tokens.textDark,
+          lineHeight: 1.05,
+        }}>
+          Contenidos
         </h2>
-        <p style={{ fontSize: 17, color: tokens.neutralPrincipal, marginBottom: 40, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 17, color: "#4B5563", marginBottom: 40, lineHeight: 1.6 }}>
           De cero a Full-stack en 16 semanas con un currículo estructurado y progresivo.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {WEEKS.map(({ week, title, topics }) => (
-            <div
-              key={week}
-              onClick={() => setOpen(open === week ? null : week)}
-              style={{
-                backgroundColor: tokens.white,
-                border: `1.5px solid ${open === week ? tokens.primarySubtle : tokens.neutralMid}`,
-                borderRadius: 10,
-                padding: "16px 20px",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                gap: 0,
-                transition: "border-color 0.2s",
-              }}
-            >
-              {/* Header row */}
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <span style={{
-                  minWidth: 36,
-                  height: 36,
-                  borderRadius: "50%",
-                  backgroundColor: open === week ? tokens.primary : tokens.primaryOff,
-                  color: open === week ? tokens.accent : tokens.primarySubtle,
+          {WEEKS.map(({ week, title, topics }) => {
+            const isOpen = open === week;
+            return (
+              <div
+                key={week}
+                onClick={() => setOpen(isOpen ? null : week)}
+                style={{
+                  backgroundColor: tokens.white,
+                  border: `1.5px solid ${isOpen ? tokens.accent : tokens.borderLight}`,
+                  borderRadius: 4,
+                  padding: "16px 20px",
+                  cursor: "pointer",
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  transition: "all 0.2s",
-                  flexShrink: 0,
-                }}>
-                  {week}
-                </span>
-                <span style={{ fontWeight: 600, fontSize: 15, color: tokens.primary, flex: 1 }}>{title}</span>
-                <span style={{ color: tokens.neutralMid, fontSize: 18, fontWeight: 300 }}>{open === week ? "−" : "+"}</span>
-              </div>
-
-              {/* Expanded content */}
-              {open === week && (
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    marginTop: 16,
-                    paddingTop: 16,
-                    borderTop: `1px solid ${tokens.neutralMid}`,
+                  flexDirection: "column",
+                  gap: 0,
+                  transition: "border-color 0.2s",
+                }}
+              >
+                {/* Header row */}
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  <span style={{
+                    minWidth: 36,
+                    height: 36,
+                    borderRadius: 0,
+                    backgroundColor: isOpen ? tokens.textDark : "#E8ECF0",
+                    color: isOpen ? tokens.accent : tokens.textDark,
                     display: "flex",
-                    flexDirection: "column",
-                    gap: 16,
-                  }}
-                >
-                  {topics.map(({ name, items }) => (
-                    <div key={name}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: tokens.primary, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                        {name}
-                      </div>
-                      <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 3 }}>
-                        {items.map((item) => (
-                          <li key={item} style={{ fontSize: 14, color: tokens.neutralPrincipal, lineHeight: 1.5 }}>
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    transition: "all 0.2s",
+                    flexShrink: 0,
+                  }}>
+                    {week}
+                  </span>
+                  <span style={{ fontWeight: 600, fontSize: 15, color: tokens.textDark, flex: 1 }}>{title}</span>
+                  <span style={{
+                    color: tokens.textDark,
+                    fontSize: 20,
+                    fontWeight: 400,
+                    display: "inline-block",
+                    transition: "transform 0.25s ease",
+                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                    lineHeight: 1,
+                  }}>→</span>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Expanded content */}
+                {isOpen && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    style={{
+                      marginTop: 16,
+                      paddingTop: 16,
+                      borderTop: `1px solid ${tokens.borderLight}`,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 16,
+                    }}
+                  >
+                    {topics.map(({ name, items }) => (
+                      <div key={name}>
+                        <div style={{
+                          fontWeight: 700,
+                          fontSize: 13,
+                          color: tokens.textDark,
+                          marginBottom: 6,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.04em",
+                        }}>
+                          {name}
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 3 }}>
+                          {items.map((item) => (
+                            <li key={item} style={{ fontSize: 14, color: "#4B5563", lineHeight: 1.5 }}>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -687,13 +841,13 @@ function CurriculumSection() {
 
 function InstructorSection() {
   return (
-    <section id="profesor" style={{ padding: "80px 32px", backgroundColor: tokens.white }}>
+    <section id="profesor" style={{ padding: "100px 32px", backgroundColor: tokens.bg }}>
       <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", gap: 48, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{
-          width: 180,
-          height: 180,
-          borderRadius: "50%",
-          border: `4px solid ${tokens.accent}`,
+          width: 200,
+          height: 200,
+          borderRadius: 0,
+          border: `3px solid ${tokens.accent}`,
           flexShrink: 0,
           overflow: "hidden",
         }}>
@@ -705,10 +859,17 @@ function InstructorSection() {
         </div>
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
-          <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em", margin: "12px 0 8px", color: tokens.primary }}>
-            <span aria-hidden="true">🎓 </span>Guillermo Rodas
+          <h2 style={{
+            fontSize: 44,
+            fontWeight: 700,
+            letterSpacing: "-0.03em",
+            margin: "12px 0 12px",
+            color: tokens.white,
+            lineHeight: 1.05,
+          }}>
+            Guillermo Rodas
           </h2>
-          <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.neutralPrincipal, marginBottom: 20 }}>
+          <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.textMuted, marginBottom: 20 }}>
             Desarrollador Full-stack en JavaScript de Colombia viviendo en Suecia.
             Google Developer Expert en Tecnologías Web, Auth0 Ambassador y organizador de CSS Conf Colombia.
           </p>
@@ -721,7 +882,7 @@ function InstructorSection() {
             ].map((item) => (
               <div key={item} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <span style={{ color: tokens.accent, fontSize: 18, lineHeight: 1.4 }}>✦</span>
-                <span style={{ fontSize: 15, color: tokens.neutralPrincipal }}>{item}</span>
+                <span style={{ fontSize: 15, color: tokens.textMuted }}>{item}</span>
               </div>
             ))}
           </div>
@@ -757,41 +918,47 @@ const TESTIMONIALS = [
 
 function TestimonialsSection() {
   return (
-    <section id="testimonios" style={{ padding: "80px 32px", backgroundColor: tokens.primary }}>
+    <section id="testimonios" style={{ padding: "100px 32px", backgroundColor: tokens.bgLight }}>
       <div style={{ maxWidth: 960, margin: "0 auto" }}>
-        <Badge>Testimonios</Badge>
-        <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 48px", color: tokens.white }}>
-          <span aria-hidden="true">🌟 </span>Lo que dicen los estudiantes
+        <Badge variant="light">Testimonios</Badge>
+        <h2 style={{
+          fontSize: 52,
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          margin: "16px 0 48px",
+          color: tokens.textDark,
+          lineHeight: 1.05,
+        }}>
+          Lo que dicen los estudiantes
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
           {TESTIMONIALS.map(({ name, handle, role, quote, image }) => (
             <div key={name} style={{
-              backgroundColor: "#ffffff0f",
-              border: "1px solid #ffffff18",
-              borderRadius: 14,
+              backgroundColor: tokens.white,
+              borderLeft: `4px solid ${tokens.accent}`,
+              borderRadius: 4,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
               padding: 28,
             }}>
               <img src={image} alt={name} style={{
                 width: 56,
                 height: 56,
-                borderRadius: "50%",
+                borderRadius: 0,
                 objectFit: "cover",
                 display: "block",
                 marginBottom: 16,
-                border: `2px solid ${tokens.accent}`,
               }} />
               <p style={{
                 fontSize: 15,
                 lineHeight: 1.7,
-                color: tokens.primaryOff,
+                color: "#4B5563",
                 marginBottom: 20,
-                fontStyle: "italic",
               }}>
                 "{quote}"
               </p>
               <div>
-                <div style={{ fontWeight: 700, color: tokens.white, fontSize: 15 }}>{name}</div>
-                <div style={{ fontSize: 13, color: tokens.accent }}>{role} · {handle}</div>
+                <div style={{ fontWeight: 700, color: tokens.textDark, fontSize: 15 }}>{name}</div>
+                <div style={{ fontSize: 13, color: "#4B5563" }}>{role} · {handle}</div>
               </div>
             </div>
           ))}
@@ -802,65 +969,83 @@ function TestimonialsSection() {
 }
 
 const FAQ_ITEMS = [
-  { q: "💸 ¿Cuánto cuesta?", a: "Es totalmente gratis. Sin ningún costo oculto." },
-  { q: "⏳ ¿Cuánto dura?", a: "16 semanas estimadas con 10 horas semanales (6 horas en vivo)." },
-  { q: "🗓️ ¿Cuándo empieza?", a: "Inició el 1 de Marzo del 2023, pero aún puedes empezar cuando quieras." },
-  { q: "🎒 ¿Qué requisitos hay?", a: "Un computador con acceso a internet y muchas ganas de aprender." },
-  { q: "📹 ¿Quedan grabadas las clases?", a: "Sí, y puedes verlas en diferido cuando quieras." },
-  { q: "💾 Ya sé programar, ¿puedo asistir?", a: "Sí, seguro aprenderás algo nuevo." },
-  { q: "🐣 No tengo conocimientos previos", a: "Sin problema — habrá asesorías offline para apoyar a todos." },
-  { q: "🎟 ¿Hay cupos limitados?", a: "No hay límite para las clases, pero las mentorías offline serán limitadas." },
+  { q: "¿Cuánto cuesta?", a: "Es totalmente gratis. Sin ningún costo oculto." },
+  { q: "¿Cuánto dura?", a: "16 semanas estimadas con 10 horas semanales (6 horas en vivo)." },
+  { q: "¿Cuándo empieza?", a: "Inició el 1 de Marzo del 2023, pero aún puedes empezar cuando quieras." },
+  { q: "¿Qué requisitos hay?", a: "Un computador con acceso a internet y muchas ganas de aprender." },
+  { q: "¿Quedan grabadas las clases?", a: "Sí, y puedes verlas en diferido cuando quieras." },
+  { q: "Ya sé programar, ¿puedo asistir?", a: "Sí, seguro aprenderás algo nuevo." },
+  { q: "No tengo conocimientos previos", a: "Sin problema — habrá asesorías offline para apoyar a todos." },
+  { q: "¿Hay cupos limitados?", a: "No hay límite para las clases, pero las mentorías offline serán limitadas." },
 ];
 
 function FAQSection() {
   const [open, setOpen] = useState(null);
   return (
-    <section id="faq" style={{ padding: "80px 32px", backgroundColor: tokens.neutralOff }}>
+    <section id="faq" style={{ padding: "100px 32px", backgroundColor: tokens.bgSurface }}>
       <div style={{ maxWidth: 700, margin: "0 auto" }}>
         <Badge>Preguntas frecuentes</Badge>
-        <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", margin: "16px 0 40px", color: tokens.primary }}>
-          <span aria-hidden="true">🙋 </span>FAQ
+        <h2 style={{
+          fontSize: 52,
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          margin: "16px 0 40px",
+          color: tokens.white,
+          lineHeight: 1.05,
+        }}>
+          FAQ
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {FAQ_ITEMS.map(({ q, a }, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: tokens.white,
-                border: `1.5px solid ${open === i ? tokens.primarySubtle : tokens.neutralMid}`,
-                borderRadius: 10,
-                overflow: "hidden",
-                transition: "border-color 0.2s",
-              }}
-            >
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
+          {FAQ_ITEMS.map(({ q, a }, i) => {
+            const isOpen = open === i;
+            return (
+              <div
+                key={i}
                 style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "16px 20px",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontFamily: "'Manrope', sans-serif",
-                  fontWeight: 700,
-                  fontSize: 15,
-                  color: tokens.primary,
+                  backgroundColor: "#1C2433",
+                  border: `1.5px solid ${isOpen ? tokens.accent : tokens.border}`,
+                  borderRadius: 4,
+                  overflow: "hidden",
+                  transition: "border-color 0.2s",
                 }}
               >
-                {q}
-                <span style={{ fontSize: 18, color: tokens.neutralMid }}>{open === i ? "−" : "+"}</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: "0 20px 16px", fontSize: 15, color: tokens.neutralPrincipal, lineHeight: 1.6 }}>
-                  {a}
-                </div>
-              )}
-            </div>
-          ))}
+                <button
+                  onClick={() => setOpen(isOpen ? null : i)}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    padding: "16px 20px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 600,
+                    fontSize: 16,
+                    color: tokens.white,
+                  }}
+                >
+                  {q}
+                  <span style={{
+                    fontSize: 20,
+                    color: isOpen ? tokens.accent : tokens.textMuted,
+                    display: "inline-block",
+                    transition: "transform 0.25s ease, color 0.2s",
+                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                    lineHeight: 1,
+                    marginLeft: 12,
+                  }}>→</span>
+                </button>
+                {isOpen && (
+                  <div style={{ padding: "0 20px 16px", fontSize: 15, color: tokens.textMuted, lineHeight: 1.6 }}>
+                    {a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -870,57 +1055,65 @@ function FAQSection() {
 function CTASection({ onSignup }) {
   return (
     <section style={{
-      backgroundColor: tokens.accent,
-      padding: "80px 32px",
+      backgroundColor: "#000000",
+      padding: "120px 48px",
       textAlign: "center",
     }}>
-      <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.02em", color: tokens.primary, marginBottom: 16 }}>
+      <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <h2 style={{
+          fontSize: "clamp(48px, 8vw, 88px)",
+          fontWeight: 700,
+          letterSpacing: "-0.04em",
+          color: tokens.accent,
+          marginBottom: 24,
+          lineHeight: 1.0,
+        }}>
           ¿Listo para empezar?
         </h2>
-        <p style={{ fontSize: 18, color: "#1a3d2b", marginBottom: 36, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 18, color: tokens.textMuted, marginBottom: 36, lineHeight: 1.6 }}>
           Únete al bootcamp más completo de Full-stack JavaScript. Gratis, online y con una comunidad increíble.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={onSignup} style={{
-            backgroundColor: tokens.primary,
-            color: tokens.white,
-            padding: "16px 36px",
-            fontSize: 17,
-            fontWeight: 700,
-            fontFamily: "'Manrope', sans-serif",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
-          }}>
-            Inscribirse gratis →
-          </button>
-          <a href="https://undf.sh/discord" target="_blank" rel="noopener noreferrer" style={{
-            backgroundColor: "transparent",
-            color: tokens.primary,
-            padding: "16px 36px",
-            fontSize: 17,
-            fontWeight: 700,
-            fontFamily: "'Manrope', sans-serif",
-            border: `2px solid ${tokens.primary}`,
-            borderRadius: 8,
-            cursor: "pointer",
-            textDecoration: "none",
-            display: "inline-block",
-          }}>
-            Unirse al Discord
-          </a>
+          <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
         </div>
       </div>
     </section>
   );
 }
 
+function FooterLink({ href, label }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        color: hover ? tokens.white : tokens.textMuted,
+        textDecoration: "none",
+        fontSize: 14,
+        fontWeight: 600,
+        transition: "color 0.2s",
+      }}
+    >
+      {label}
+    </a>
+  );
+}
+
 function Footer() {
   return (
-    <footer style={{ backgroundColor: tokens.primary, color: tokens.primaryOff, padding: "32px", textAlign: "center" }}>
+    <footer style={{ backgroundColor: tokens.bg, color: tokens.textMuted, padding: "32px", textAlign: "center" }}>
       <div style={{ marginBottom: 16 }}>
-        <span style={{ fontWeight: 800, fontSize: 18, color: tokens.white }}>
+        <span style={{
+          fontWeight: 700,
+          fontSize: 22,
+          fontFamily: "'Space Grotesk', sans-serif",
+          color: tokens.white,
+          letterSpacing: "-0.02em",
+        }}>
           undefined<span style={{ color: tokens.accent }}>.academy</span>
         </span>
       </div>
@@ -932,13 +1125,10 @@ function Footer() {
           { label: "Instagram", href: "https://instagram.com/undefinedshell" },
           { label: "Twitch",    href: "https://undf.sh/en-vivo" },
         ].map(({ label, href }) => (
-          <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-            style={{ color: tokens.neutralMid, textDecoration: "none", fontSize: 14, fontWeight: 600 }}>
-            {label}
-          </a>
+          <FooterLink key={label} href={href} label={label} />
         ))}
       </div>
-      <p style={{ fontSize: 13, color: "#ffffff55" }}>
+      <p style={{ fontSize: 13, color: tokens.border }}>
         © {new Date().getFullYear()} Guillermo Rodas · undefined.academy
       </p>
     </footer>
@@ -954,7 +1144,6 @@ export default function App() {
 
   return (
     <div style={styles.global}>
-      <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       <Nav onSignup={openSignup} />
       <Hero onSignup={openSignup} />
       <CurriculumSection />
