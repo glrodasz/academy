@@ -3,12 +3,12 @@
   <text font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="38" dominant-baseline="central" y="33">
     <tspan
       x="6"
-      fill="#22c55e"
+      fill="#ffffff"
       stroke="#000"
       stroke-width="2"
       paint-order="stroke fill"
     >u</tspan><tspan
-      fill="#ffffff"
+      fill="#b5ff4d"
       stroke="#000"
       stroke-width="2"
       paint-order="stroke fill"
