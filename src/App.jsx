@@ -522,21 +522,6 @@ function Hero({ onSignup }) {
       position: "relative",
       overflow: "hidden",
     }}>
-      <div style={{
-        position: "absolute",
-        right: "-2%",
-        top: "50%",
-        transform: "translateY(-50%)",
-        fontSize: "clamp(160px, 28vw, 320px)",
-        fontWeight: 700,
-        fontFamily: "'Space Grotesk', sans-serif",
-        color: tokens.white,
-        opacity: 0.025,
-        lineHeight: 1,
-        userSelect: "none",
-        pointerEvents: "none",
-        letterSpacing: "-0.05em",
-      }}>JS</div>
       <div style={{ position: "relative", maxWidth: 720, margin: "0 auto" }}>
         <Badge>Bootcamp · 16 semanas · Gratis</Badge>
         <h1 style={{
