@@ -44,7 +44,7 @@ function Badge({ children, variant = "dark" }) {
       backgroundColor: isLight ? tokens.textDark : "transparent",
       color: isLight ? tokens.white : tokens.accent,
       border: isLight ? "none" : `1px solid ${tokens.accent}`,
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 600,
       fontFamily: "'Space Grotesk', sans-serif",
       letterSpacing: "0.08em",
@@ -174,7 +174,7 @@ function SignupModal({ onClose }) {
   const inputStyle = {
     width: "100%",
     padding: "12px 14px",
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: "'Inter', sans-serif",
     border: `1.5px solid ${tokens.border}`,
     borderRadius: 4,
@@ -225,8 +225,13 @@ function SignupModal({ onClose }) {
           aria-label="Cerrar"
           style={{
             position: "absolute",
-            top: 16,
-            right: 16,
+            top: 6,
+            right: 6,
+            width: 44,
+            height: 44,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             background: "none",
             border: "none",
             cursor: "pointer",
@@ -328,6 +333,8 @@ function SignupModal({ onClose }) {
               <input
                 required
                 type="text"
+                autoComplete="name"
+                aria-label="Tu nombre"
                 placeholder="Tu nombre"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -337,6 +344,8 @@ function SignupModal({ onClose }) {
               <input
                 required
                 type="email"
+                autoComplete="email"
+                aria-label="Tu correo electrónico"
                 placeholder="Tu correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -464,7 +473,10 @@ function Nav({ onSignup }) {
             background: "none",
             border: "none",
             cursor: "pointer",
-            padding: 8,
+            width: 44,
+            height: 44,
+            alignItems: "center",
+            justifyContent: "center",
             display: "none",
           }}
         >
@@ -750,57 +762,70 @@ function CurriculumSection() {
             return (
               <div
                 key={week}
-                onClick={() => setOpen(isOpen ? null : week)}
                 style={{
                   backgroundColor: tokens.white,
                   border: `1.5px solid ${isOpen ? tokens.accent : tokens.borderLight}`,
                   borderRadius: 4,
-                  padding: "16px 20px",
-                  cursor: "pointer",
                   display: "flex",
                   flexDirection: "column",
                   gap: 0,
                   transition: "border-color 0.2s",
                 }}
               >
-                {/* Header row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  <span style={{
-                    minWidth: 36,
-                    height: 36,
-                    borderRadius: 0,
-                    backgroundColor: isOpen ? tokens.textDark : "#E8ECF0",
-                    color: isOpen ? tokens.accent : tokens.textDark,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    transition: "all 0.2s",
-                    flexShrink: 0,
-                  }}>
-                    {week}
-                  </span>
-                  <span style={{ fontWeight: 600, fontSize: 15, color: tokens.textDark, flex: 1 }}>{title}</span>
-                  <span style={{
-                    color: tokens.textDark,
-                    fontSize: 20,
-                    fontWeight: 400,
-                    display: "inline-block",
-                    transition: "transform 0.25s ease",
-                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                    lineHeight: 1,
-                  }}>→</span>
-                </div>
+                <h3 style={{ margin: 0 }}>
+                  <button
+                    onClick={() => setOpen(isOpen ? null : week)}
+                    aria-expanded={isOpen}
+                    aria-controls={`semana-${week}`}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 16,
+                      padding: "16px 20px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontFamily: "'Inter', sans-serif",
+                    }}
+                  >
+                    <span style={{
+                      minWidth: 36,
+                      height: 36,
+                      borderRadius: 0,
+                      backgroundColor: isOpen ? tokens.textDark : "#E8ECF0",
+                      color: isOpen ? tokens.accent : tokens.textDark,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      transition: "all 0.2s",
+                      flexShrink: 0,
+                    }}>
+                      {week}
+                    </span>
+                    <span style={{ fontWeight: 600, fontSize: 15, color: tokens.textDark, flex: 1 }}>{title}</span>
+                    <span style={{
+                      color: tokens.textDark,
+                      fontSize: 20,
+                      fontWeight: 400,
+                      display: "inline-block",
+                      transition: "transform 0.25s ease",
+                      transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                      lineHeight: 1,
+                    }} aria-hidden="true">→</span>
+                  </button>
+                </h3>
 
-                {/* Expanded content */}
                 {isOpen && (
                   <div
-                    onClick={(e) => e.stopPropagation()}
+                    id={`semana-${week}`}
                     style={{
-                      marginTop: 16,
-                      paddingTop: 16,
+                      margin: "0 20px",
+                      padding: "16px 0",
                       borderTop: `1px solid ${tokens.borderLight}`,
                       display: "flex",
                       flexDirection: "column",
@@ -852,8 +877,11 @@ function InstructorSection() {
           overflow: "hidden",
         }}>
           <img
-            src="/images/guillermo.png"
+            src="/images/guillermo.webp"
             alt="Guillermo Rodas"
+            width={200}
+            height={200}
+            loading="lazy"
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
         </div>
@@ -898,21 +926,21 @@ const TESTIMONIALS = [
     handle: "@teffcode",
     role: "Sr. Frontend Dev",
     quote: "Gracias a Guille y a sus enseñanzas en el Bootcamp, me enamoré del desarrollo web. Conoce el por qué de cada cosa y la explica de una manera increíble.",
-    image: "/images/estefany.jpg",
+    image: "/images/estefany.webp",
   },
   {
     name: "Carlos Azaustre",
     handle: "@carlosazaustre",
     role: "Google Dev Expert",
     quote: "Guillermo es un auténtico todoterreno. No solo domina Frontend y Backend, además las explica de forma natural y sencilla.",
-    image: "/images/carlos.jpg",
+    image: "/images/carlos.webp",
   },
   {
     name: "Juan Garces",
     handle: "@juangarcesme",
     role: "Sr. Product Designer",
     quote: "Una de las cosas que más admiro de él es la forma en que puede transformar un tema complejo en un mensaje claro y fácil de entender.",
-    image: "/images/juan.jpg",
+    image: "/images/juan.webp",
   },
 ];
 
@@ -940,7 +968,7 @@ function TestimonialsSection() {
               boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
               padding: 28,
             }}>
-              <img src={image} alt={name} style={{
+              <img src={image} alt={name} width={56} height={56} loading="lazy" style={{
                 width: 56,
                 height: 56,
                 borderRadius: 0,
@@ -1011,6 +1039,7 @@ function FAQSection() {
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
+                  aria-expanded={isOpen}
                   style={{
                     width: "100%",
                     textAlign: "left",
@@ -1091,6 +1120,8 @@ function FooterLink({ href, label }) {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
+        display: "inline-block",
+        padding: "12px 4px",
         color: hover ? tokens.white : tokens.textMuted,
         textDecoration: "none",
         fontSize: 14,
@@ -1106,7 +1137,7 @@ function FooterLink({ href, label }) {
 function Footer() {
   return (
     <footer style={{ backgroundColor: tokens.bg, color: tokens.textMuted, padding: "32px", textAlign: "center" }}>
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 4 }}>
         <span style={{
           fontWeight: 700,
           fontSize: 22,
@@ -1117,7 +1148,7 @@ function Footer() {
           undefined<span style={{ color: tokens.accent }}>.academy</span>
         </span>
       </div>
-      <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", marginBottom: 24 }}>
+      <div style={{ display: "flex", columnGap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
         {[
           { label: "GitHub",    href: "https://github.com/glrodasz/academy" },
           { label: "YouTube",   href: "https://germo.me/bootcamp-en-diferido" },
@@ -1146,12 +1177,14 @@ export default function App() {
   return (
     <div style={styles.global}>
       <Nav onSignup={openSignup} />
-      <Hero onSignup={openSignup} />
-      <CurriculumSection />
-      <InstructorSection />
-      <TestimonialsSection />
-      <FAQSection />
-      <CTASection onSignup={openSignup} />
+      <main>
+        <Hero onSignup={openSignup} />
+        <CurriculumSection />
+        <InstructorSection />
+        <TestimonialsSection />
+        <FAQSection />
+        <CTASection onSignup={openSignup} />
+      </main>
       <Footer />
       {modalOpen && <SignupModal onClose={closeSignup} />}
     </div>
