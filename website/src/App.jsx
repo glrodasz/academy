@@ -1,25 +1,34 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
-// Quantum Design System — Bold Editorial (Dark-first, Lime Accent)
+// Quantum Design System — Cyberpunk (Dark-first, Lime + Neon Cyan)
+// Mirrors the CSS custom properties in index.css; hover, focus and effects live there.
 const tokens = {
   bg:          "#0D1117",
   bgSurface:   "#161B24",
-  bgLight:     "#F2F5F8",
+  bgRaised:    "#111823",
+  bgDeep:      "#05070A",
   accent:      "#B5FF4D",
   accentFg:    "#0D1117",
+  neonCyan:    "#00F0FF",
+  neonPink:    "#FF2E97",
   text:        "#FFFFFF",
-  textMuted:   "#7A8799",
-  textDark:    "#111827",
+  textBody:    "#C9D1D9",
+  textMuted:   "#8B98AB",
   border:      "#1E2A3A",
-  borderLight: "#E2E8F0",
   white:       "#FFFFFF",
+};
+
+const fonts = {
+  display: "'Space Grotesk', sans-serif",
+  body:    "'Inter', sans-serif",
+  mono:    "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
 };
 
 const styles = {
   global: {
-    fontFamily: "'Inter', sans-serif",
-    color: tokens.textDark,
+    fontFamily: fonts.body,
+    color: tokens.textBody,
     backgroundColor: tokens.bg,
     margin: 0,
     padding: 0,
@@ -34,110 +43,232 @@ function heroPatternDataUrl({ fill, fillOpacity }) {
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }
 
+const pad2 = (n) => String(n).padStart(2, "0");
+
+const GLYPHS = "01<>/\\#$%&*+=?![]{}";
+const GLYPH_RATIO = 0.14;
+
+/**
+ * Renders a photo as a halftone of neon dots sprinkled with scrambling glyphs.
+ * The real <img> stays underneath for alt text and SEO, and shows through on hover.
+ */
+function PixelPortrait({ src, alt, size, cell = 5, className = "", style }) {
+  const wrapperRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cols = Math.floor(size / cell);
+    const step = size / cols;
+
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
+    let luminance = null;
+    let glyphCells = new Map();
+    let timer = null;
+    let loaded = false;
+
+    const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+
+    const pickGlyphs = (ratio) => {
+      for (let i = 0; i < luminance.length; i++) {
+        if (luminance[i] < 0.35) continue;
+        const roll = Math.random();
+        if (roll < ratio) glyphCells.set(i, randomGlyph());
+        else if (roll < ratio * 2) glyphCells.delete(i);
+      }
+    };
+
+    const draw = () => {
+      ctx.fillStyle = tokens.bgDeep;
+      ctx.fillRect(0, 0, size, size);
+      ctx.font = `700 ${step * 1.15}px ${fonts.mono}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (let i = 0; i < luminance.length; i++) {
+        const l = luminance[i];
+        if (l < 0.08) continue;
+        const cx = (i % cols) * step + step / 2;
+        const cy = Math.floor(i / cols) * step + step / 2;
+        const glyph = glyphCells.get(i);
+        if (glyph) {
+          ctx.globalAlpha = 0.45 + 0.55 * l;
+          ctx.fillStyle = tokens.neonCyan;
+          ctx.fillText(glyph, cx, cy);
+        } else {
+          ctx.globalAlpha = 0.35 + 0.65 * l;
+          ctx.fillStyle = tokens.accent;
+          ctx.beginPath();
+          ctx.arc(cx, cy, (step / 2) * 0.95 * l, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const sample = (img) => {
+      // Center-crop to a square, then downscale so each pixel is one cell
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = (img.naturalWidth - side) / 2;
+      const sy = (img.naturalHeight - side) / 2;
+      const off = document.createElement("canvas");
+      off.width = cols;
+      off.height = cols;
+      const offCtx = off.getContext("2d", { willReadFrequently: true });
+      offCtx.drawImage(img, sx, sy, side, side, 0, 0, cols, cols);
+      const { data } = offCtx.getImageData(0, 0, cols, cols);
+
+      // Estimate the backdrop color from the edge cells so the subject can be
+      // separated from it, whether the photo has a light or a dark background
+      const bg = [0, 0, 0];
+      let edgeCount = 0;
+      for (let i = 0; i < cols * cols; i++) {
+        const x = i % cols;
+        const y = Math.floor(i / cols);
+        if (x !== 0 && y !== 0 && x !== cols - 1) continue;
+        for (let c = 0; c < 3; c++) bg[c] += data[i * 4 + c];
+        edgeCount++;
+      }
+      for (let c = 0; c < 3; c++) bg[c] /= edgeCount;
+
+      const raw = new Float32Array(cols * cols);
+      const mask = new Float32Array(cols * cols);
+      for (let i = 0; i < raw.length; i++) {
+        const [r, g, b] = [data[i * 4], data[i * 4 + 1], data[i * 4 + 2]];
+        raw[i] = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        const dist = Math.hypot(r - bg[0], g - bg[1], b - bg[2]) / 441;
+        const t = Math.min(Math.max((dist - 0.08) / 0.22, 0), 1);
+        mask[i] = t * t * (3 - 2 * t);
+      }
+
+      // Percentile stretch so faces stay legible regardless of the photo's exposure
+      const sorted = Array.from(raw).sort((a, b) => a - b);
+      const lo = sorted[Math.floor(sorted.length * 0.02)];
+      const range = sorted[Math.floor(sorted.length * 0.98)] - lo || 1;
+      luminance = raw.map((l, i) => {
+        const norm = Math.min(Math.max((l - lo) / range, 0), 1);
+        return mask[i] * (0.3 + 0.7 * Math.pow(norm, 0.75));
+      });
+      glyphCells = new Map();
+      pickGlyphs(GLYPH_RATIO);
+      draw();
+    };
+
+    const start = () => {
+      if (!loaded) {
+        loaded = true;
+        const img = new Image();
+        img.onload = () => {
+          sample(img);
+          document.fonts?.ready.then(draw);
+        };
+        img.src = src;
+      }
+      if (!reduceMotion && !timer) {
+        timer = setInterval(() => {
+          if (!luminance) return;
+          pickGlyphs(0.03);
+          draw();
+        }, 140);
+      }
+    };
+
+    const stop = () => {
+      clearInterval(timer);
+      timer = null;
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      { rootMargin: "200px" },
+    );
+    observer.observe(wrapper);
+
+    return () => {
+      observer.disconnect();
+      stop();
+    };
+  }, [src, size, cell]);
+
+  return (
+    <div ref={wrapperRef} className={`pixel-portrait ${className}`} style={{ width: size, height: size, ...style }}>
+      <img src={src} alt={alt} width={size} height={size} loading="lazy" />
+      <canvas ref={canvasRef} aria-hidden="true" />
+    </div>
+  );
+}
+
 // ─── COMPONENTS ───────────────────────────────────────────────
 
-function Badge({ children, variant = "dark" }) {
-  const isLight = variant === "light";
+function Badge({ children }) {
   return (
-    <span style={{
-      display: "inline-block",
-      backgroundColor: isLight ? tokens.textDark : "transparent",
-      color: isLight ? tokens.white : tokens.accent,
-      border: isLight ? "none" : `1px solid ${tokens.accent}`,
-      fontSize: 12,
-      fontWeight: 600,
-      fontFamily: "'Space Grotesk', sans-serif",
-      letterSpacing: "0.08em",
-      textTransform: "uppercase",
-      padding: "4px 10px",
-      borderRadius: 2,
-    }}>
+    <span className="badge cut-corners cut-border" style={{ "--cut": "6px" }}>
+      <span className="badge-prefix" aria-hidden="true">//</span>
       {children}
     </span>
   );
 }
 
-function PrimaryButton({ children, onClick, size = "md" }) {
-  const [hover, setHover] = useState(false);
-  const padding = size === "lg" ? "16px 36px" : "12px 24px";
-  const fontSize = size === "lg" ? 17 : 15;
+function Logo({ size = 24 }) {
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        backgroundColor: hover ? "#c8ff6e" : tokens.accent,
-        color: tokens.accentFg,
-        padding,
-        fontSize,
-        fontWeight: 700,
-        fontFamily: "'Space Grotesk', sans-serif",
-        border: "none",
-        borderRadius: 4,
-        cursor: "pointer",
-        transition: "background-color 0.2s",
-        letterSpacing: "0.01em",
-      }}
-    >
-      {children}
-    </button>
+    <span style={{
+      color: tokens.white,
+      fontFamily: fonts.display,
+      fontWeight: 700,
+      fontSize: size,
+      letterSpacing: "-0.02em",
+    }}>
+      undefined<span style={{ color: tokens.accent }}>.academy</span>
+      <span className="cursor-blink" aria-hidden="true" style={{ width: "0.4em", height: "0.85em", marginLeft: 3, verticalAlign: "-0.05em" }} />
+    </span>
+  );
+}
+
+function PrimaryButton({ children, onClick, size = "md", type = "button", disabled }) {
+  return (
+    <span className="cyber-btn-glow">
+      <button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className={`cyber-btn cyber-btn-primary cyber-btn-${size} cut-corners`}
+      >
+        {children}
+      </button>
+    </span>
   );
 }
 
 function SubmitAccentButton({ children, disabled }) {
-  const [hover, setHover] = useState(false);
   return (
-    <button
-      type="submit"
-      disabled={disabled}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        backgroundColor: disabled ? tokens.textMuted : hover ? "#c8ff6e" : tokens.accent,
-        color: tokens.accentFg,
-        padding: "16px 36px",
-        fontSize: 17,
-        fontWeight: 700,
-        fontFamily: "'Space Grotesk', sans-serif",
-        border: "none",
-        borderRadius: 4,
-        cursor: disabled ? "not-allowed" : "pointer",
-        transition: "background-color 0.2s",
-        letterSpacing: "0.01em",
-        marginTop: 4,
-        opacity: disabled ? 0.85 : 1,
-      }}
-    >
-      {children}
-    </button>
+    <div style={{ marginTop: 4 }}>
+      <span className="cyber-btn-glow" style={{ display: "block" }}>
+        <button
+          type="submit"
+          disabled={disabled}
+          className="cyber-btn cyber-btn-primary cyber-btn-lg cut-corners"
+          style={{ width: "100%" }}
+        >
+          {children}
+        </button>
+      </span>
+    </div>
   );
 }
 
-function SecondaryButton({ children, onClick, variant = "dark" }) {
-  const [hover, setHover] = useState(false);
-  const baseColor = variant === "light" ? tokens.white : tokens.textDark;
-  const hoverColor = tokens.accent;
+function SecondaryButton({ children, onClick }) {
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        backgroundColor: "transparent",
-        color: hover ? hoverColor : baseColor,
-        padding: "12px 24px",
-        fontSize: 15,
-        fontWeight: 700,
-        fontFamily: "'Space Grotesk', sans-serif",
-        border: `2px solid ${hover ? hoverColor : baseColor}`,
-        borderRadius: 4,
-        cursor: "pointer",
-        transition: "all 0.2s",
-      }}
-    >
-      {children}
-    </button>
+    <span className="cyber-btn-glow">
+      <button type="button" onClick={onClick} className="cyber-btn cyber-btn-secondary cut-corners cut-border">
+        {children}
+      </button>
+    </span>
   );
 }
 
@@ -171,51 +302,37 @@ function SignupModal({ onClose }) {
     }
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "12px 14px",
-    fontSize: 16,
-    fontFamily: "'Inter', sans-serif",
-    border: `1.5px solid ${tokens.border}`,
-    borderRadius: 4,
-    outline: "none",
-    color: tokens.white,
-    backgroundColor: "#1C2433",
-    boxSizing: "border-box",
-  };
-
-  const linkStyle = {
-    color: tokens.accent,
-    fontWeight: 600,
-    textDecoration: "none",
-    borderBottom: `1px solid ${tokens.accent}`,
-  };
-
   return (
     <div
       onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
-        backgroundColor: "rgba(0,0,0,0.75)",
+        backgroundColor: "rgba(5,7,10,0.85)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         zIndex: 1000,
-        padding: 24,
+        padding: 16,
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="signup-modal-title"
         onClick={(e) => e.stopPropagation()}
+        className="cut-corners scanlines"
         style={{
+          "--cut": "20px",
           backgroundColor: tokens.bgSurface,
-          borderRadius: 4,
-          border: `1px solid ${tokens.border}`,
-          borderLeft: `4px solid ${tokens.accent}`,
-          boxShadow: "0 24px 64px rgba(0,0,0,0.45)",
-          padding: "40px 36px",
+          borderTop: `3px solid ${tokens.accent}`,
+          padding: "40px 32px 32px",
           width: "100%",
-          maxWidth: 420,
+          maxWidth: 440,
+          maxHeight: "calc(100vh - 32px)",
+          overflowY: "auto",
           position: "relative",
         }}
       >
@@ -235,132 +352,134 @@ function SignupModal({ onClose }) {
             background: "none",
             border: "none",
             cursor: "pointer",
-            fontSize: 22,
+            fontSize: 20,
+            fontFamily: fonts.mono,
             color: tokens.textMuted,
             lineHeight: 1,
+            zIndex: 2,
           }}
         >
           ✕
         </button>
 
-        {status === "success" ? (
-          <div style={{ padding: "8px 0 0", textAlign: "left" }}>
-            <h3 style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: "clamp(26px, 6vw, 34px)",
-              fontWeight: 700,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.05,
-              margin: "0 0 20px",
-              color: tokens.white,
-            }}>
-              <span aria-hidden="true" style={{ marginRight: 8 }}>🎉</span>
-              <span style={{ color: tokens.accent }}>Gracias</span>
-            </h3>
-            <p style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: tokens.textMuted,
-              margin: "0 0 12px",
-            }}>
-              ¿Qué más debo hacer?
-            </p>
-            <ol style={{
-              fontSize: 15,
-              color: tokens.white,
-              lineHeight: 1.75,
-              paddingLeft: 22,
-              margin: "0 0 24px",
-              fontFamily: "'Inter', sans-serif",
-            }}>
-              <li style={{ marginBottom: 10 }}>
-                Accede al Discord:{" "}
-                <a href="https://germo.me/bootcamp-discord" target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                  https://germo.me/bootcamp-discord
-                </a>
-              </li>
-              <li>
-                Empieza aquí:{" "}
-                <a href="https://germo.me/bootcamp-empezar" target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                  https://germo.me/bootcamp-empezar
-                </a>
-              </li>
-            </ol>
-            <div style={{
-              borderTop: `1px solid ${tokens.border}`,
-              paddingTop: 20,
-              marginTop: 4,
-            }}>
-              <p style={{
-                fontSize: 12,
-                color: tokens.textMuted,
-                lineHeight: 1.65,
-                margin: "0 0 14px",
-                textAlign: "left",
+        <div style={{ position: "relative", zIndex: 2 }}>
+          {status === "success" ? (
+            <div style={{ padding: "8px 0 0", textAlign: "left" }}>
+              <h3 id="signup-modal-title" style={{
+                fontFamily: fonts.display,
+                fontSize: "clamp(26px, 6vw, 34px)",
+                fontWeight: 700,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
+                margin: "0 0 20px",
+                color: tokens.white,
               }}>
-                ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
-              </p>
-              <p style={{
-                fontSize: 12,
-                color: tokens.textMuted,
-                lineHeight: 1.65,
-                margin: 0,
-                textAlign: "left",
+                <span aria-hidden="true" style={{ marginRight: 8 }}>🎉</span>
+                <span className="glitch-static" style={{ color: tokens.accent }}>Gracias</span>
+              </h3>
+              <p className="mono" style={{
+                fontSize: 11,
+                fontWeight: 500,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: tokens.neonCyan,
+                margin: "0 0 12px",
               }}>
-                🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
+                ¿Qué más debo hacer?
               </p>
+              <ol style={{
+                fontSize: 15,
+                color: tokens.white,
+                lineHeight: 1.75,
+                paddingLeft: 22,
+                margin: "0 0 24px",
+                fontFamily: fonts.body,
+              }}>
+                <li style={{ marginBottom: 10 }}>
+                  Accede al Discord:{" "}
+                  <a href="https://germo.me/bootcamp-discord" target="_blank" rel="noopener noreferrer" className="modal-link">
+                    https://germo.me/bootcamp-discord
+                  </a>
+                </li>
+                <li>
+                  Empieza aquí:{" "}
+                  <a href="https://germo.me/bootcamp-empezar" target="_blank" rel="noopener noreferrer" className="modal-link">
+                    https://germo.me/bootcamp-empezar
+                  </a>
+                </li>
+              </ol>
+              <div style={{
+                borderTop: `1px solid ${tokens.border}`,
+                paddingTop: 20,
+                marginTop: 4,
+              }}>
+                <p style={{
+                  fontSize: 12,
+                  color: tokens.textMuted,
+                  lineHeight: 1.65,
+                  margin: "0 0 14px",
+                  textAlign: "left",
+                }}>
+                  ✉️ Tu correo solo será usado para enviarte información relevante al Bootcamp.
+                </p>
+                <p style={{
+                  fontSize: 12,
+                  color: tokens.textMuted,
+                  lineHeight: 1.65,
+                  margin: 0,
+                  textAlign: "left",
+                }}>
+                  🌟 Ayudame invitando a tus conocidos y conocidas 🌈 ¡En equipo se aprende mejor!
+                </p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <>
-            <Badge>Bootcamp gratuito</Badge>
-            <h3 style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontSize: 24,
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              color: tokens.white,
-              margin: "12px 0 6px",
-            }}>
-              Inscríbete al bootcamp
-            </h3>
-            <p style={{ fontSize: 14, color: tokens.textMuted, marginBottom: 24, lineHeight: 1.5 }}>
-              16 semanas · Full-stack JavaScript · 100% gratis
-            </p>
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <input
-                required
-                type="text"
-                autoComplete="name"
-                aria-label="Tu nombre"
-                placeholder="Tu nombre"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="signup-modal-input"
-                style={inputStyle}
-              />
-              <input
-                required
-                type="email"
-                autoComplete="email"
-                aria-label="Tu correo electrónico"
-                placeholder="Tu correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="signup-modal-input"
-                style={inputStyle}
-              />
-              {status === "error" && (
-                <p style={{ fontSize: 13, color: "#ff6b6b", margin: 0 }}>{errorMsg}</p>
-              )}
-              <SubmitAccentButton disabled={status === "loading"}>
-                {status === "loading" ? "Enviando…" : "Inscribirse gratis →"}
-              </SubmitAccentButton>
-            </form>
-          </>
-        )}
+          ) : (
+            <>
+              <Badge>Bootcamp gratuito</Badge>
+              <h3 id="signup-modal-title" style={{
+                fontFamily: fonts.display,
+                fontSize: 26,
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                color: tokens.white,
+                margin: "14px 0 6px",
+              }}>
+                Inscríbete al bootcamp
+              </h3>
+              <p className="mono" style={{ fontSize: 13, color: tokens.textMuted, marginBottom: 24, lineHeight: 1.5 }}>
+                16 semanas · Full-stack JavaScript · 100% gratis
+              </p>
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <input
+                  required
+                  type="text"
+                  autoComplete="name"
+                  aria-label="Tu nombre"
+                  placeholder="Tu nombre"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="signup-modal-input"
+                />
+                <input
+                  required
+                  type="email"
+                  autoComplete="email"
+                  aria-label="Tu correo electrónico"
+                  placeholder="Tu correo electrónico"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="signup-modal-input"
+                />
+                {status === "error" && (
+                  <p role="alert" style={{ fontSize: 13, color: tokens.neonPink, margin: 0 }}>{errorMsg}</p>
+                )}
+                <SubmitAccentButton disabled={status === "loading"}>
+                  {status === "loading" ? "Enviando…" : "Inscribirse gratis →"}
+                </SubmitAccentButton>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -381,8 +500,7 @@ function HamburgerIcon({ open }) {
     left: 0,
     width: 22,
     height: 2,
-    borderRadius: 2,
-    backgroundColor: tokens.white,
+    backgroundColor: tokens.accent,
     top,
     transition: "transform 0.25s, opacity 0.25s",
     transform: rotate,
@@ -397,41 +515,12 @@ function HamburgerIcon({ open }) {
   );
 }
 
-function NavLink({ href, label, onClick }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <a
-      href={href}
-      onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        color: hover ? tokens.white : tokens.textMuted,
-        textDecoration: "none",
-        fontSize: 14,
-        fontWeight: 600,
-        padding: "6px 2px",
-        borderBottom: hover ? `1.5px solid ${tokens.accent}` : "1.5px solid transparent",
-        transition: "color 0.2s, border-color 0.2s",
-      }}
-    >
-      {label}
-    </a>
-  );
-}
-
 function Nav({ onSignup }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const close = () => setMenuOpen(false);
 
   return (
-    <nav style={{
-      position: "sticky",
-      top: 0,
-      zIndex: 100,
-      backgroundColor: tokens.bg,
-      borderBottom: `1px solid ${tokens.border}`,
-    }}>
+    <nav className="site-nav">
       {/* Top bar */}
       <div style={{
         padding: "0 24px",
@@ -440,28 +529,20 @@ function Nav({ onSignup }) {
         justifyContent: "space-between",
         height: 64,
       }}>
-        <a href="/" style={{ textDecoration: "none" }}>
-          <span style={{
-            color: tokens.white,
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontWeight: 700,
-            fontSize: 24,
-            letterSpacing: "-0.02em",
-          }}>
-            undefined<span style={{ color: tokens.accent }}>.academy</span>
-          </span>
+        <a href="/" aria-label="undefined.academy — Inicio" style={{ textDecoration: "none" }}>
+          <Logo />
         </a>
 
         {/* Desktop links */}
-        <div style={{ display: "flex", gap: 20 }} className="nav-desktop-links">
+        <div style={{ display: "flex", gap: 24 }} className="nav-desktop-links">
           {NAV_LINKS.map(({ href, label }) => (
-            <NavLink key={href} href={href} label={label} />
+            <a key={href} href={href} className="nav-link">{label}</a>
           ))}
         </div>
 
         {/* Desktop CTA */}
         <div className="nav-desktop-cta">
-          <PrimaryButton size="sm" onClick={onSignup}>Inscribirse →</PrimaryButton>
+          <PrimaryButton size="md" onClick={onSignup}>Inscribirse →</PrimaryButton>
         </div>
 
         {/* Hamburger (mobile only) */}
@@ -469,6 +550,7 @@ function Nav({ onSignup }) {
           onClick={() => setMenuOpen((o) => !o)}
           className="nav-hamburger"
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuOpen}
           style={{
             background: "none",
             border: "none",
@@ -487,32 +569,20 @@ function Nav({ onSignup }) {
       {/* Mobile drawer */}
       {menuOpen && (
         <div style={{
-          backgroundColor: tokens.bg,
           borderTop: `1px solid ${tokens.border}`,
-          padding: "16px 24px 24px",
+          padding: "8px 24px 24px",
           display: "flex",
           flexDirection: "column",
           gap: 4,
         }}
           className="nav-mobile-drawer">
-          {NAV_LINKS.map(({ href, label }) => (
-            <a
-              key={href}
-              href={href}
-              onClick={close}
-              style={{
-                color: tokens.textMuted,
-                textDecoration: "none",
-                fontSize: 16,
-                fontWeight: 600,
-                padding: "12px 0",
-                borderBottom: `1px solid ${tokens.border}`,
-              }}
-            >
+          {NAV_LINKS.map(({ href, label }, i) => (
+            <a key={href} href={href} onClick={close} className="nav-mobile-link">
+              <span aria-hidden="true" style={{ color: tokens.neonCyan, marginRight: 12 }}>{pad2(i + 1)}</span>
               {label}
             </a>
           ))}
-          <div style={{ marginTop: 16 }}>
+          <div className="hero-cta-buttons" style={{ marginTop: 16, display: "flex" }}>
             <PrimaryButton size="lg" onClick={() => { close(); onSignup(); }}>Inscribirse →</PrimaryButton>
           </div>
         </div>
@@ -523,78 +593,75 @@ function Nav({ onSignup }) {
 
 function Hero({ onSignup }) {
   return (
-    <section style={{
+    <section className="hero scanlines" style={{
       backgroundColor: tokens.bg,
-      backgroundImage: heroPatternDataUrl({ fill: tokens.border, fillOpacity: 0.4 }),
+      backgroundImage: heroPatternDataUrl({ fill: tokens.accent, fillOpacity: 0.05 }),
       backgroundRepeat: "repeat",
       backgroundSize: "304px 304px",
       color: tokens.white,
-      padding: "120px 32px 100px",
+      padding: "clamp(72px, 12vw, 120px) 20px clamp(80px, 12vw, 120px)",
       textAlign: "center",
-      position: "relative",
-      overflow: "hidden",
     }}>
-      <div style={{ position: "relative", maxWidth: 1100, margin: "0 auto" }}>
+      <div className="grid-floor" aria-hidden="true" />
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
         <Badge>Bootcamp · 16 semanas · Gratis</Badge>
-        <h1 style={{
-          fontSize: "clamp(56px, 10vw, 104px)",
+        <h1 className="hero-title" style={{
+          fontSize: "clamp(44px, 10vw, 104px)",
           fontWeight: 700,
           lineHeight: 1.0,
           letterSpacing: "-0.04em",
-          margin: "24px 0 20px",
+          margin: "28px 0 24px",
           color: tokens.white,
         }}>
           Conviértete en<br />
-          <span style={{ color: tokens.accent }}>Full-stack Developer</span>
+          <span className="glitch" style={{ display: "inline-block" }}>Full-stack Developer</span>
         </h1>
         <p style={{
-          fontSize: 20,
+          fontSize: "clamp(17px, 2.4vw, 20px)",
           lineHeight: 1.6,
-          color: tokens.textMuted,
-          fontFamily: "'Inter', sans-serif",
-          maxWidth: 520,
+          color: tokens.textBody,
+          fontFamily: fonts.body,
+          maxWidth: 560,
           margin: "0 auto 40px",
           fontWeight: 400,
         }}>
+          <span className="mono" aria-hidden="true" style={{ color: tokens.neonCyan, marginRight: 8 }}>&gt;</span>
           16 semanas de formación intensiva en JavaScript — completamente gratis y 100% online.
+          <span className="cursor-blink" aria-hidden="true" />
         </p>
-        <div className="hero-cta-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="hero-cta-buttons" style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
-          <SecondaryButton variant="light" onClick={() => document.getElementById("contenidos").scrollIntoView({ behavior: "smooth" })}>Ver contenidos</SecondaryButton>
+          <SecondaryButton onClick={() => document.getElementById("contenidos").scrollIntoView({ behavior: "smooth" })}>Ver contenidos</SecondaryButton>
         </div>
-        <div style={{
-          marginTop: 56,
-          display: "flex",
-          justifyContent: "center",
-          gap: 40,
-          flexWrap: "wrap",
-        }}>
+        <dl className="hero-stats" style={{ padding: 0 }}>
           {[
             { value: "16", label: "Semanas" },
             { value: "10h", label: "Por semana" },
             { value: "100%", label: "Gratuito" },
             { value: "Online", label: "En vivo + diferido" },
           ].map(({ value, label }) => (
-            <div key={label} style={{ textAlign: "center" }}>
-              <div style={{
-                fontSize: 52,
+            <div key={label} className="stat-card hud-corners" style={{ textAlign: "center", display: "flex", flexDirection: "column-reverse" }}>
+              <dt className="mono" style={{
+                fontSize: 11,
+                color: tokens.textMuted,
+                marginTop: 10,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+              }}>{label}</dt>
+              <dd style={{
+                margin: 0,
+                fontSize: "clamp(32px, 5vw, 48px)",
                 fontWeight: 700,
-                fontFamily: "'Space Grotesk', sans-serif",
+                fontFamily: fonts.display,
                 color: tokens.accent,
                 letterSpacing: "-0.03em",
                 lineHeight: 1,
-              }}>{value}</div>
-              <div style={{
-                fontSize: 12,
-                color: tokens.textMuted,
-                marginTop: 8,
-                fontWeight: 500,
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-              }}>{label}</div>
+                textShadow: "0 0 18px rgba(181,255,77,0.35)",
+              }}>{value}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );
@@ -740,83 +807,35 @@ function CurriculumSection() {
   const [open, setOpen] = useState(null);
 
   return (
-    <section id="contenidos" style={{ padding: "100px 32px", backgroundColor: tokens.bgLight }}>
+    <section id="contenidos" style={{ padding: "clamp(72px, 10vw, 100px) 20px", backgroundColor: tokens.bgSurface }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <Badge variant="light">Programa</Badge>
-        <h2 style={{
-          fontSize: 52,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
-          margin: "16px 0 8px",
-          color: tokens.textDark,
-          lineHeight: 1.05,
-        }}>
+        <Badge>Programa</Badge>
+        <h2 className="section-title" style={{ margin: "16px 0 8px" }}>
           Contenidos
         </h2>
-        <p style={{ fontSize: 17, color: "#4B5563", marginBottom: 40, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 17, color: tokens.textMuted, marginBottom: 40, lineHeight: 1.6 }}>
           De cero a Full-stack en 16 semanas con un currículo estructurado y progresivo.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {WEEKS.map(({ week, title, topics }) => {
             const isOpen = open === week;
             return (
-              <div
-                key={week}
-                style={{
-                  backgroundColor: tokens.white,
-                  border: `1.5px solid ${isOpen ? tokens.accent : tokens.borderLight}`,
-                  borderRadius: 4,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0,
-                  transition: "border-color 0.2s",
-                }}
-              >
+              <div key={week} className="accordion-item" data-open={isOpen}>
                 <h3 style={{ margin: 0 }}>
                   <button
                     onClick={() => setOpen(isOpen ? null : week)}
                     aria-expanded={isOpen}
                     aria-controls={`semana-${week}`}
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 16,
-                      padding: "16px 20px",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      fontFamily: "'Inter', sans-serif",
-                    }}
+                    className="accordion-trigger"
                   >
-                    <span style={{
-                      minWidth: 36,
-                      height: 36,
-                      borderRadius: 0,
-                      backgroundColor: isOpen ? tokens.textDark : "#E8ECF0",
-                      color: isOpen ? tokens.accent : tokens.textDark,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 13,
-                      fontWeight: 700,
-                      fontFamily: "'Space Grotesk', sans-serif",
-                      transition: "all 0.2s",
-                      flexShrink: 0,
-                    }}>
-                      {week}
+                    <span className="week-number cut-corners cut-border" aria-hidden="true">
+                      {pad2(week)}
                     </span>
-                    <span style={{ fontWeight: 600, fontSize: 15, color: tokens.textDark, flex: 1 }}>{title}</span>
-                    <span style={{
-                      color: tokens.textDark,
-                      fontSize: 20,
-                      fontWeight: 400,
-                      display: "inline-block",
-                      transition: "transform 0.25s ease",
-                      transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                      lineHeight: 1,
-                    }} aria-hidden="true">→</span>
+                    <span style={{ fontFamily: fonts.body, fontWeight: 600, fontSize: 15, flex: 1 }}>
+                      <span className="visually-hidden">Semana {week}: </span>
+                      {title}
+                    </span>
+                    <span className="accordion-chevron" aria-hidden="true">›</span>
                   </button>
                 </h3>
 
@@ -825,30 +844,28 @@ function CurriculumSection() {
                     id={`semana-${week}`}
                     style={{
                       margin: "0 20px",
-                      padding: "16px 0",
-                      borderTop: `1px solid ${tokens.borderLight}`,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 16,
+                      padding: "16px 0 20px",
+                      borderTop: `1px dashed ${tokens.border}`,
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                      gap: 20,
                     }}
                   >
                     {topics.map(({ name, items }) => (
                       <div key={name}>
-                        <div style={{
-                          fontWeight: 700,
-                          fontSize: 13,
-                          color: tokens.textDark,
-                          marginBottom: 6,
+                        <h4 className="mono" style={{
+                          fontWeight: 500,
+                          fontSize: 12,
+                          color: tokens.neonCyan,
+                          margin: "0 0 8px",
                           textTransform: "uppercase",
-                          letterSpacing: "0.04em",
+                          letterSpacing: "0.08em",
                         }}>
                           {name}
-                        </div>
-                        <ul style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 3 }}>
+                        </h4>
+                        <ul className="topic-list">
                           {items.map((item) => (
-                            <li key={item} style={{ fontSize: 14, color: "#4B5563", lineHeight: 1.5 }}>
-                              {item}
-                            </li>
+                            <li key={item}>{item}</li>
                           ))}
                         </ul>
                       </div>
@@ -866,54 +883,33 @@ function CurriculumSection() {
 
 function InstructorSection() {
   return (
-    <section id="profesor" style={{ padding: "100px 32px", backgroundColor: tokens.bg }}>
+    <section id="profesor" style={{ padding: "clamp(72px, 10vw, 100px) 20px", backgroundColor: tokens.bg }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: 48, alignItems: "center", flexWrap: "wrap" }}>
-        <div style={{
-          width: 200,
-          height: 200,
-          borderRadius: 0,
-          border: `3px solid ${tokens.accent}`,
-          flexShrink: 0,
-          overflow: "hidden",
-        }}>
-          <img
-            src="/images/guillermo.webp"
-            alt="Guillermo Rodas"
-            width={200}
-            height={200}
-            loading="lazy"
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          />
+        <div className="instructor-photo cut-corners">
+          <PixelPortrait src="/images/guillermo.webp" alt="Guillermo Rodas" size={214} cell={5} className="cut-corners" style={{ "--cut": "18px" }} />
         </div>
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
-          <h2 style={{
-            fontSize: 44,
-            fontWeight: 700,
-            letterSpacing: "-0.03em",
-            margin: "12px 0 12px",
-            color: tokens.white,
-            lineHeight: 1.05,
-          }}>
+          <h2 className="section-title" style={{ fontSize: "clamp(34px, 6vw, 44px)", margin: "14px 0 12px" }}>
             Guillermo Rodas
           </h2>
-          <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.textMuted, marginBottom: 20 }}>
+          <p style={{ fontSize: 16, lineHeight: 1.7, color: tokens.textBody, marginBottom: 20 }}>
             Desarrollador Full-stack en JavaScript de Colombia viviendo en Suecia.
             Google Developer Expert en Tecnologías Web, Auth0 Ambassador y organizador de CSS Conf Colombia.
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 10 }}>
             {[
               "Profesor de 6 cursos en Platzi",
               "Coach técnico en Platzi Master por más de 2 años",
               "Mentor del Bootcamp Full-stack con World Tech Makers",
               "Más de 50 charlas en meetups y conferencias",
             ].map((item) => (
-              <div key={item} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <span style={{ color: tokens.accent, fontSize: 18, lineHeight: 1.4 }}>✦</span>
-                <span style={{ fontSize: 15, color: tokens.textMuted }}>{item}</span>
-              </div>
+              <li key={item} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span className="mono" aria-hidden="true" style={{ color: tokens.accent, fontSize: 15, lineHeight: 1.5 }}>▸</span>
+                <span style={{ fontSize: 15, color: tokens.textMuted, lineHeight: 1.5 }}>{item}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>
@@ -946,49 +942,39 @@ const TESTIMONIALS = [
 
 function TestimonialsSection() {
   return (
-    <section id="testimonios" style={{ padding: "100px 32px", backgroundColor: tokens.bgLight }}>
+    <section id="testimonios" style={{ padding: "clamp(72px, 10vw, 100px) 20px", backgroundColor: tokens.bgSurface }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <Badge variant="light">Testimonios</Badge>
-        <h2 style={{
-          fontSize: 52,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
-          margin: "16px 0 48px",
-          color: tokens.textDark,
-          lineHeight: 1.05,
-        }}>
+        <Badge>Testimonios</Badge>
+        <h2 className="section-title" style={{ margin: "16px 0 48px" }}>
           Lo que dicen los estudiantes
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: 24 }}>
           {TESTIMONIALS.map(({ name, handle, role, quote, image }) => (
-            <div key={name} style={{
-              backgroundColor: tokens.white,
-              borderLeft: `4px solid ${tokens.accent}`,
-              borderRadius: 4,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-              padding: 28,
-            }}>
-              <img src={image} alt={name} width={56} height={56} loading="lazy" style={{
-                width: 56,
-                height: 56,
-                borderRadius: 0,
-                objectFit: "cover",
-                display: "block",
-                marginBottom: 16,
-              }} />
-              <p style={{
+            <figure key={name} className="testimonial-card cut-corners cut-border" style={{ margin: 0 }}>
+              <span className="mono" aria-hidden="true" style={{
+                fontSize: 40,
+                lineHeight: 1,
+                color: tokens.accent,
+                textShadow: "0 0 16px rgba(181,255,77,0.4)",
+                marginBottom: 8,
+              }}>“</span>
+              <blockquote style={{
+                margin: "0 0 24px",
                 fontSize: 15,
                 lineHeight: 1.7,
-                color: "#4B5563",
-                marginBottom: 20,
+                color: tokens.textBody,
+                flex: 1,
               }}>
-                "{quote}"
-              </p>
-              <div>
-                <div style={{ fontWeight: 700, color: tokens.textDark, fontSize: 15 }}>{name}</div>
-                <div style={{ fontSize: 13, color: "#4B5563" }}>{role} · {handle}</div>
-              </div>
-            </div>
+                {quote}
+              </blockquote>
+              <figcaption style={{ display: "flex", alignItems: "center", gap: 14, borderTop: `1px dashed ${tokens.border}`, paddingTop: 18 }}>
+                <PixelPortrait src={image} alt={name} size={64} cell={3.2} className="cut-corners" style={{ "--cut": "8px", flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontWeight: 700, color: tokens.white, fontSize: 15 }}>{name}</div>
+                  <div className="mono" style={{ fontSize: 12, color: tokens.textMuted }}>{role} · <span style={{ color: tokens.neonCyan }}>{handle}</span></div>
+                </div>
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>
@@ -1010,65 +996,34 @@ const FAQ_ITEMS = [
 function FAQSection() {
   const [open, setOpen] = useState(null);
   return (
-    <section id="faq" style={{ padding: "100px 32px", backgroundColor: tokens.bgSurface }}>
+    <section id="faq" style={{ padding: "clamp(72px, 10vw, 100px) 20px", backgroundColor: tokens.bg }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <Badge>Preguntas frecuentes</Badge>
-        <h2 style={{
-          fontSize: 52,
-          fontWeight: 700,
-          letterSpacing: "-0.03em",
-          margin: "16px 0 40px",
-          color: tokens.white,
-          lineHeight: 1.05,
-        }}>
+        <h2 className="section-title" style={{ margin: "16px 0 40px" }}>
           FAQ
         </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {FAQ_ITEMS.map(({ q, a }, i) => {
             const isOpen = open === i;
             return (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: "#1C2433",
-                  border: `1.5px solid ${isOpen ? tokens.accent : tokens.border}`,
-                  borderRadius: 4,
-                  overflow: "hidden",
-                  transition: "border-color 0.2s",
-                }}
-              >
-                <button
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  aria-expanded={isOpen}
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    padding: "16px 20px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontWeight: 600,
-                    fontSize: 16,
-                    color: tokens.white,
-                  }}
-                >
-                  {q}
-                  <span style={{
-                    fontSize: 20,
-                    color: isOpen ? tokens.accent : tokens.textMuted,
-                    display: "inline-block",
-                    transition: "transform 0.25s ease, color 0.2s",
-                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                    lineHeight: 1,
-                    marginLeft: 12,
-                  }}>→</span>
-                </button>
+              <div key={i} className="accordion-item" data-open={isOpen} style={{ backgroundColor: isOpen ? tokens.bgRaised : tokens.bgSurface }}>
+                <h3 style={{ margin: 0 }}>
+                  <button
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-${i}`}
+                    className="accordion-trigger"
+                    style={{ fontFamily: fonts.display, fontWeight: 600, fontSize: 16 }}
+                  >
+                    <span className="mono" aria-hidden="true" style={{ color: isOpen ? tokens.accent : tokens.neonCyan, fontSize: 13, fontWeight: 500 }}>
+                      {pad2(i + 1)}
+                    </span>
+                    <span style={{ flex: 1 }}>{q}</span>
+                    <span className="accordion-chevron" aria-hidden="true">›</span>
+                  </button>
+                </h3>
                 {isOpen && (
-                  <div style={{ padding: "0 20px 16px", fontSize: 15, color: tokens.textMuted, lineHeight: 1.6 }}>
+                  <div id={`faq-${i}`} style={{ padding: "0 20px 18px 56px", fontSize: 15, color: tokens.textBody, lineHeight: 1.6 }}>
                     {a}
                   </div>
                 )}
@@ -1083,26 +1038,30 @@ function FAQSection() {
 
 function CTASection({ onSignup }) {
   return (
-    <section style={{
-      backgroundColor: "#000000",
-      padding: "120px 48px",
+    <section className="cta scanlines" style={{
+      backgroundColor: tokens.bgDeep,
+      padding: "clamp(88px, 12vw, 120px) 20px",
       textAlign: "center",
     }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h2 style={{
-          fontSize: "clamp(48px, 8vw, 88px)",
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto" }}>
+        <p className="mono" style={{ fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: tokens.neonCyan, margin: "0 0 20px" }}>
+          <span aria-hidden="true">&gt; </span>sistema listo
+        </p>
+        <h2 className="glitch-static" style={{
+          fontSize: "clamp(40px, 8vw, 88px)",
           fontWeight: 700,
           letterSpacing: "-0.04em",
           color: tokens.accent,
-          marginBottom: 24,
+          margin: "0 0 24px",
           lineHeight: 1.0,
+          textWrap: "balance",
         }}>
           ¿Listo para empezar?
         </h2>
-        <p style={{ fontSize: 18, color: tokens.textMuted, marginBottom: 36, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 18, color: tokens.textBody, maxWidth: 620, margin: "0 auto 36px", lineHeight: 1.6 }}>
           Únete al bootcamp más completo de Full-stack JavaScript. Gratis, online y con una comunidad increíble.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="hero-cta-buttons" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <PrimaryButton size="lg" onClick={onSignup}>Inscribirse gratis →</PrimaryButton>
         </div>
       </div>
@@ -1110,43 +1069,17 @@ function CTASection({ onSignup }) {
   );
 }
 
-function FooterLink({ href, label }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        display: "inline-block",
-        padding: "12px 4px",
-        color: hover ? tokens.white : tokens.textMuted,
-        textDecoration: "none",
-        fontSize: 14,
-        fontWeight: 600,
-        transition: "color 0.2s",
-      }}
-    >
-      {label}
-    </a>
-  );
-}
-
 function Footer() {
   return (
-    <footer style={{ backgroundColor: tokens.bg, color: tokens.textMuted, padding: "32px", textAlign: "center" }}>
-      <div style={{ marginBottom: 4 }}>
-        <span style={{
-          fontWeight: 700,
-          fontSize: 22,
-          fontFamily: "'Space Grotesk', sans-serif",
-          color: tokens.white,
-          letterSpacing: "-0.02em",
-        }}>
-          undefined<span style={{ color: tokens.accent }}>.academy</span>
-        </span>
+    <footer style={{
+      backgroundColor: tokens.bg,
+      color: tokens.textMuted,
+      padding: "40px 20px 32px",
+      textAlign: "center",
+      borderTop: `1px solid ${tokens.border}`,
+    }}>
+      <div style={{ marginBottom: 8 }}>
+        <Logo size={22} />
       </div>
       <div style={{ display: "flex", columnGap: 16, justifyContent: "center", flexWrap: "wrap", marginBottom: 12 }}>
         {[
@@ -1157,10 +1090,10 @@ function Footer() {
           { label: "Twitter",   href: "https://twitter.com/germorodas" },
           { label: "Instagram", href: "https://instagram.com/germorodas" },
         ].map(({ label, href }) => (
-          <FooterLink key={label} href={href} label={label} />
+          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="footer-link">{label}</a>
         ))}
       </div>
-      <p style={{ fontSize: 13, color: tokens.textMuted }}>
+      <p className="mono" style={{ fontSize: 12, color: tokens.textMuted, margin: 0 }}>
         © {new Date().getFullYear()} Guillermo Rodas · undefined.academy
       </p>
     </footer>
