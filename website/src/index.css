@@ -514,8 +514,30 @@ input, select, textarea {
   padding: 3px;
   background: linear-gradient(135deg, var(--accent), var(--neon-cyan));
 }
-.instructor-photo img {
-  --cut: 18px;
+
+/* ─── Pixel portrait ───────────────────────────────────────── */
+
+.pixel-portrait {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+}
+.pixel-portrait img,
+.pixel-portrait canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pixel-portrait img {
+  object-fit: cover;
+}
+.pixel-portrait canvas {
+  transition: opacity 0.35s ease;
+}
+.pixel-portrait:hover canvas {
+  opacity: 0;
 }
 
 /* ─── Testimonials ─────────────────────────────────────────── */

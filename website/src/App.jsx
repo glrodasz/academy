@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
 // Quantum Design System — Cyberpunk (Dark-first, Lime + Neon Cyan)
@@ -44,6 +44,165 @@ function heroPatternDataUrl({ fill, fillOpacity }) {
 }
 
 const pad2 = (n) => String(n).padStart(2, "0");
+
+const GLYPHS = "01<>/\\#$%&*+=?![]{}";
+const GLYPH_RATIO = 0.14;
+
+/**
+ * Renders a photo as a halftone of neon dots sprinkled with scrambling glyphs.
+ * The real <img> stays underneath for alt text and SEO, and shows through on hover.
+ */
+function PixelPortrait({ src, alt, size, cell = 5, className = "", style }) {
+  const wrapperRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const cols = Math.floor(size / cell);
+    const step = size / cols;
+
+    canvas.width = size * dpr;
+    canvas.height = size * dpr;
+    ctx.scale(dpr, dpr);
+
+    let luminance = null;
+    let glyphCells = new Map();
+    let timer = null;
+    let loaded = false;
+
+    const randomGlyph = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+
+    const pickGlyphs = (ratio) => {
+      for (let i = 0; i < luminance.length; i++) {
+        if (luminance[i] < 0.35) continue;
+        const roll = Math.random();
+        if (roll < ratio) glyphCells.set(i, randomGlyph());
+        else if (roll < ratio * 2) glyphCells.delete(i);
+      }
+    };
+
+    const draw = () => {
+      ctx.fillStyle = tokens.bgDeep;
+      ctx.fillRect(0, 0, size, size);
+      ctx.font = `700 ${step * 1.15}px ${fonts.mono}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      for (let i = 0; i < luminance.length; i++) {
+        const l = luminance[i];
+        if (l < 0.08) continue;
+        const cx = (i % cols) * step + step / 2;
+        const cy = Math.floor(i / cols) * step + step / 2;
+        const glyph = glyphCells.get(i);
+        if (glyph) {
+          ctx.globalAlpha = 0.45 + 0.55 * l;
+          ctx.fillStyle = tokens.neonCyan;
+          ctx.fillText(glyph, cx, cy);
+        } else {
+          ctx.globalAlpha = 0.35 + 0.65 * l;
+          ctx.fillStyle = tokens.accent;
+          ctx.beginPath();
+          ctx.arc(cx, cy, (step / 2) * 0.95 * l, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const sample = (img) => {
+      // Center-crop to a square, then downscale so each pixel is one cell
+      const side = Math.min(img.naturalWidth, img.naturalHeight);
+      const sx = (img.naturalWidth - side) / 2;
+      const sy = (img.naturalHeight - side) / 2;
+      const off = document.createElement("canvas");
+      off.width = cols;
+      off.height = cols;
+      const offCtx = off.getContext("2d", { willReadFrequently: true });
+      offCtx.drawImage(img, sx, sy, side, side, 0, 0, cols, cols);
+      const { data } = offCtx.getImageData(0, 0, cols, cols);
+
+      // Estimate the backdrop color from the edge cells so the subject can be
+      // separated from it, whether the photo has a light or a dark background
+      const bg = [0, 0, 0];
+      let edgeCount = 0;
+      for (let i = 0; i < cols * cols; i++) {
+        const x = i % cols;
+        const y = Math.floor(i / cols);
+        if (x !== 0 && y !== 0 && x !== cols - 1) continue;
+        for (let c = 0; c < 3; c++) bg[c] += data[i * 4 + c];
+        edgeCount++;
+      }
+      for (let c = 0; c < 3; c++) bg[c] /= edgeCount;
+
+      const raw = new Float32Array(cols * cols);
+      const mask = new Float32Array(cols * cols);
+      for (let i = 0; i < raw.length; i++) {
+        const [r, g, b] = [data[i * 4], data[i * 4 + 1], data[i * 4 + 2]];
+        raw[i] = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        const dist = Math.hypot(r - bg[0], g - bg[1], b - bg[2]) / 441;
+        const t = Math.min(Math.max((dist - 0.08) / 0.22, 0), 1);
+        mask[i] = t * t * (3 - 2 * t);
+      }
+
+      // Percentile stretch so faces stay legible regardless of the photo's exposure
+      const sorted = Array.from(raw).sort((a, b) => a - b);
+      const lo = sorted[Math.floor(sorted.length * 0.02)];
+      const range = sorted[Math.floor(sorted.length * 0.98)] - lo || 1;
+      luminance = raw.map((l, i) => {
+        const norm = Math.min(Math.max((l - lo) / range, 0), 1);
+        return mask[i] * (0.3 + 0.7 * Math.pow(norm, 0.75));
+      });
+      glyphCells = new Map();
+      pickGlyphs(GLYPH_RATIO);
+      draw();
+    };
+
+    const start = () => {
+      if (!loaded) {
+        loaded = true;
+        const img = new Image();
+        img.onload = () => {
+          sample(img);
+          document.fonts?.ready.then(draw);
+        };
+        img.src = src;
+      }
+      if (!reduceMotion && !timer) {
+        timer = setInterval(() => {
+          if (!luminance) return;
+          pickGlyphs(0.03);
+          draw();
+        }, 140);
+      }
+    };
+
+    const stop = () => {
+      clearInterval(timer);
+      timer = null;
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      { rootMargin: "200px" },
+    );
+    observer.observe(wrapper);
+
+    return () => {
+      observer.disconnect();
+      stop();
+    };
+  }, [src, size, cell]);
+
+  return (
+    <div ref={wrapperRef} className={`pixel-portrait ${className}`} style={{ width: size, height: size, ...style }}>
+      <img src={src} alt={alt} width={size} height={size} loading="lazy" />
+      <canvas ref={canvasRef} aria-hidden="true" />
+    </div>
+  );
+}
 
 // ─── COMPONENTS ───────────────────────────────────────────────
 
@@ -727,15 +886,7 @@ function InstructorSection() {
     <section id="profesor" style={{ padding: "clamp(72px, 10vw, 100px) 20px", backgroundColor: tokens.bg }}>
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: 48, alignItems: "center", flexWrap: "wrap" }}>
         <div className="instructor-photo cut-corners">
-          <img
-            src="/images/guillermo.webp"
-            alt="Guillermo Rodas"
-            width={214}
-            height={214}
-            loading="lazy"
-            className="cut-corners"
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          />
+          <PixelPortrait src="/images/guillermo.webp" alt="Guillermo Rodas" size={214} cell={5} className="cut-corners" style={{ "--cut": "18px" }} />
         </div>
         <div style={{ flex: 1, minWidth: 240 }}>
           <Badge>Tu profesor</Badge>
@@ -817,14 +968,7 @@ function TestimonialsSection() {
                 {quote}
               </blockquote>
               <figcaption style={{ display: "flex", alignItems: "center", gap: 14, borderTop: `1px dashed ${tokens.border}`, paddingTop: 18 }}>
-                <img src={image} alt={name} width={48} height={48} loading="lazy" className="cut-corners" style={{
-                  "--cut": "8px",
-                  width: 48,
-                  height: 48,
-                  objectFit: "cover",
-                  display: "block",
-                  flexShrink: 0,
-                }} />
+                <PixelPortrait src={image} alt={name} size={64} cell={3.2} className="cut-corners" style={{ "--cut": "8px", flexShrink: 0 }} />
                 <div>
                   <div style={{ fontWeight: 700, color: tokens.white, fontSize: 15 }}>{name}</div>
                   <div className="mono" style={{ fontSize: 12, color: tokens.textMuted }}>{role} · <span style={{ color: tokens.neonCyan }}>{handle}</span></div>
