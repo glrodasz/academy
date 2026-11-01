@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Profiles — Semana 1</title>
-  <meta name="description" content="Galería de los perfiles creados por los estudiantes de undefined academy en la Semana 1." />
+  <meta name="description" content="Galería de las primeras páginas web creadas por los estudiantes de undefined academy en la Semana 1." />
+  <meta name="theme-color" content="#0d1117" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,7 +14,7 @@
       --surface: #161b22;
       --surface-2: #21262d;
       --border: #30363d;
-      --border-strong: #8b949e;
+      --border-strong: #6e7681;
       --text: #c9d1d9;
       --text-strong: #f0f6fc;
       --muted: #8b949e;
@@ -21,106 +22,132 @@
       --accent: #58a6ff;
       --success: #238636;
       --success-strong: #2ea043;
-      --radius: 8px;
-      --thumb-w: 1280;
-      --thumb-h: 800;
+      --warning: #e3b341;
+      --radius: 12px;
+      --gutter: 1rem;
+      --bar-h: 0px;
     }
+
+    html { scroll-padding-top: 5rem; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
+      line-height: 1.5;
       min-height: 100vh;
+      padding-bottom: calc(var(--bar-h) + 1.5rem);
     }
 
-    .wrap { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 0 var(--gutter); }
 
-    header { margin-bottom: 1.25rem; }
-    h1 { font-size: 1.5rem; font-weight: 600; color: var(--text-strong); }
-    .subtitle { font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem; }
+    button, input { font: inherit; color: inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 2rem 0 1.25rem;
+      background:
+        radial-gradient(ellipse 80% 120% at 0% 0%, rgb(46 160 67 / 0.18), transparent 60%),
+        radial-gradient(ellipse 70% 100% at 100% 0%, rgb(88 166 255 / 0.16), transparent 60%);
+      border-bottom: 1px solid var(--border);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success-strong); }
+    .hero h1 {
+      margin-top: 0.5rem;
+      font-size: clamp(1.625rem, 6vw, 2.75rem);
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-strong);
+    }
+    .hero h1 span { color: var(--success-strong); }
+    .hero p {
+      margin-top: 0.75rem;
+      max-width: 60ch;
+      font-size: 0.9375rem;
+      color: var(--text);
+    }
+    .stats { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+    .stat {
+      padding: 0.25rem 0.625rem;
+      font-size: 0.8125rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    .stat strong { color: var(--text-strong); font-variant-numeric: tabular-nums; }
 
     /* ---------- Toolbar ---------- */
     .toolbar {
       position: sticky;
       top: 0;
-      z-index: 10;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-      padding: 0.75rem 0;
-      margin-bottom: 1rem;
-      background: color-mix(in srgb, var(--bg) 92%, transparent);
-      backdrop-filter: blur(8px);
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
     }
+    .toolbar .wrap { display: flex; gap: 0.5rem; align-items: center; padding-block: 0.75rem; }
 
+    .search { position: relative; flex: 1; min-width: 0; }
+    .search svg { position: absolute; left: 0.75rem; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); fill: var(--muted); pointer-events: none; }
     #search {
-      flex: 1 1 220px;
-      min-width: 0;
-      padding: 0.5rem 0.75rem;
+      width: 100%;
+      height: 44px;
+      padding: 0 0.75rem 0 2.25rem;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 0.875rem;
+      border-radius: 8px;
+      font-size: 1rem;
     }
     #search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgb(88 166 255 / 0.25); }
     #search::placeholder { color: var(--faint); }
 
-    button {
-      font: inherit;
-      padding: 0.5rem 0.875rem;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      font-size: 0.8125rem;
+    .segmented { display: inline-flex; flex-shrink: 0; height: 44px; padding: 3px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .segmented button {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      border: 0;
+      border-radius: 5px;
+      background: transparent;
+      color: var(--muted);
       cursor: pointer;
-      white-space: nowrap;
-      background: var(--surface-2);
-      color: var(--text);
-      transition: background 0.15s, border-color 0.15s;
     }
-    button:hover { background: var(--border); border-color: var(--border-strong); }
-    button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-    .segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-    .segmented button { border: 0; border-radius: 0; background: transparent; color: var(--muted); }
-    .segmented button + button { border-left: 1px solid var(--border); }
+    .segmented button svg { width: 16px; height: 16px; fill: currentColor; }
     .segmented button[aria-pressed="true"] { background: var(--surface-2); color: var(--text-strong); }
 
-    .btn-primary {
-      background: var(--success);
-      color: #fff;
-      border-color: var(--success-strong);
-      font-weight: 600;
-    }
-    .btn-primary:hover { background: var(--success-strong); border-color: var(--success-strong); }
-    .btn-primary:disabled { background: var(--surface-2); color: var(--faint); border-color: var(--border); cursor: not-allowed; }
+    .results-line { padding: 1rem 0 0.75rem; font-size: 0.8125rem; color: var(--muted); }
 
-    .count { font-size: 0.8125rem; color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
-
-    .popup-note { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
-    .popup-note strong { color: #e3b341; }
-
-    /* ---------- Grid view ---------- */
+    /* ---------- Cards ---------- */
     .grid {
       list-style: none;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: 1fr;
       gap: 1rem;
     }
 
     .card {
-      position: relative;
       display: flex;
       flex-direction: column;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .card:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 8px 24px rgb(0 0 0 / 0.4); }
     .card.selected { border-color: var(--success-strong); box-shadow: 0 0 0 1px var(--success-strong); }
 
     .thumb {
@@ -128,20 +155,19 @@
       display: block;
       aspect-ratio: 16 / 10;
       overflow: hidden;
-      background: #fff;
+      background: var(--surface-2);
       border-bottom: 1px solid var(--border);
     }
     .thumb iframe {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: calc(var(--thumb-w) * 1px);
-      height: calc(var(--thumb-h) * 1px);
+      inset: 0 auto auto 0;
+      width: 1280px;
+      height: 800px;
       border: 0;
-      transform: scale(var(--scale, 0.2));
+      background: #fff;
+      transform: scale(var(--scale, 0.25));
       transform-origin: 0 0;
       pointer-events: none;
-      background: #fff;
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -160,43 +186,39 @@
     .thumb.loaded .placeholder { animation: none; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    .thumb .open-hint {
+    .badge-selected {
       position: absolute;
       z-index: 1;
-      right: 0.5rem;
-      bottom: 0.5rem;
-      padding: 0.25rem 0.5rem;
-      font-size: 0.75rem;
-      color: #fff;
-      background: rgb(13 17 23 / 0.85);
-      border-radius: 4px;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-    .card:hover .open-hint, .thumb:focus-visible .open-hint { opacity: 1; }
-
-    .meta {
-      display: flex;
+      top: 0.5rem;
+      left: 0.5rem;
+      display: none;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 0.75rem;
-      min-width: 0;
+      gap: 0.25rem;
+      padding: 0.125rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--success);
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
     }
-    .meta input[type="checkbox"] { width: 15px; height: 15px; flex-shrink: 0; accent-color: var(--success-strong); cursor: pointer; }
+    .card.selected .badge-selected { display: inline-flex; }
 
+    .card-body { display: flex; flex-direction: column; gap: 0.75rem; padding: 0.75rem; }
+
+    .identity { display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
     .avatar {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       flex-shrink: 0;
       background: var(--surface-2);
       object-fit: cover;
     }
-
+    .names { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .name {
-      flex: 1;
-      min-width: 0;
-      font-size: 0.875rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
       color: var(--text-strong);
       text-decoration: none;
       white-space: nowrap;
@@ -204,69 +226,189 @@
       text-overflow: ellipsis;
     }
     .name:hover { color: var(--accent); text-decoration: underline; }
+    .handle { font-size: 0.8125rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .icon-link {
       display: inline-grid;
       place-items: center;
-      width: 28px;
-      height: 28px;
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
       color: var(--muted);
-      border-radius: 6px;
+      border-radius: 8px;
     }
     .icon-link:hover { color: var(--text-strong); background: var(--surface-2); }
-    .icon-link svg { width: 16px; height: 16px; fill: currentColor; }
+    .icon-link svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* Switch: "Abrir en pestaña" */
+    .switch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      min-height: 44px;
+      padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .switch:hover { border-color: var(--border-strong); }
+    .switch input {
+      appearance: none;
+      -webkit-appearance: none;
+      position: relative;
+      flex-shrink: 0;
+      width: 40px;
+      height: 24px;
+      margin-right: 0.375rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .switch input::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .switch input:checked { background: var(--success); border-color: var(--success-strong); }
+    .switch input:checked::before { transform: translateX(16px); background: #fff; }
+    .card.selected .switch { color: var(--text-strong); border-color: var(--success); background: rgb(35 134 54 / 0.12); }
 
     /* ---------- List view ---------- */
-    .grid.list { grid-template-columns: 1fr; gap: 2px; }
-    .grid.list .card { flex-direction: row; background: transparent; border-color: transparent; transform: none; box-shadow: none; }
-    .grid.list .card:hover { background: var(--surface); border-color: var(--border); }
-    .grid.list .card.selected { border-color: var(--success-strong); }
+    .grid.list { grid-template-columns: 1fr; gap: 0.5rem; }
     .grid.list .thumb { display: none; }
-    .grid.list .meta { flex: 1; padding: 0.35rem 0.75rem; }
+    .grid.list .card-body { flex-direction: row; align-items: center; flex-wrap: wrap; }
+    .grid.list .identity { flex: 1 1 220px; }
+    .grid.list .switch { flex: 0 0 auto; }
+
+    /* ---------- Action bar ---------- */
+    .action-bar {
+      position: fixed;
+      z-index: 30;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: color-mix(in srgb, var(--surface) 94%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      box-shadow: 0 -8px 24px rgb(0 0 0 / 0.35);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .action-bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; padding-block: 0.75rem; }
+    .action-text { flex: 1 1 100%; font-size: 0.8125rem; color: var(--muted); }
+    .link-btn { padding: 0 0.25rem; font-size: inherit; color: var(--accent); background: none; border: 0; cursor: pointer; text-decoration: underline; }
+    .action-text strong { color: var(--text-strong); }
+    .action-text .warn { display: block; margin-top: 0.25rem; color: var(--warning); }
+    .actions { display: flex; gap: 0.5rem; flex: 1 1 100%; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      min-height: 44px;
+      padding: 0 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      white-space: nowrap;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn:hover:not(:disabled) { background: var(--border); border-color: var(--border-strong); }
+    .btn:disabled { color: var(--faint); cursor: not-allowed; }
+    .btn-primary { flex: 1; font-weight: 600; color: #fff; background: var(--success); border-color: var(--success-strong); }
+    .btn-primary:hover:not(:disabled) { background: var(--success-strong); border-color: var(--success-strong); }
+    .btn-primary:disabled { background: var(--surface-2); border-color: var(--border); }
+    .btn svg { width: 16px; height: 16px; fill: currentColor; }
 
     .hidden { display: none !important; }
-    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.875rem; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
 
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
-      .meta { padding: 0.5rem; gap: 0.375rem; }
-      .grid:not(.list) .meta .icon-link { display: none; }
-      .count { width: 100%; margin-left: 0; order: 10; }
-      .toolbar .btn-text { display: none; }
+    /* ---------- Larger screens ---------- */
+    @media (min-width: 560px) {
+      .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    }
+
+    @media (min-width: 768px) {
+      :root { --gutter: 1.5rem; }
+      .hero { padding: 3.5rem 0 2rem; }
+      .hero p { font-size: 1.0625rem; }
+      .grid { gap: 1.25rem; }
+      .card:hover { border-color: var(--border-strong); }
+      .card.selected:hover { border-color: var(--success-strong); }
+      .action-text { flex: 1 1 auto; }
+      .actions { flex: 0 0 auto; }
+      .btn-primary { flex: 0 0 auto; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .card, .thumb .placeholder { transition: none; animation: none; }
-      .card:hover { transform: none; }
+      *, *::before { transition: none !important; animation: none !important; }
     }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>GitHub Profiles</h1>
-    <p class="subtitle">Semana 1 — perfiles creados por los estudiantes de undefined academy</p>
-  </header>
 
-  <div class="toolbar" role="toolbar" aria-label="Filtros y acciones">
-    <input id="search" type="search" placeholder="Buscar perfiles…" autocomplete="off" aria-label="Buscar perfiles" />
-    <div class="segmented" role="group" aria-label="Vista">
-      <button type="button" data-view="grid" aria-pressed="true">Grid</button>
-      <button type="button" data-view="list" aria-pressed="false">Lista</button>
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>undefined academy · Semana 1</span>
+    <h1>Las primeras páginas web <span>de cada estudiante</span></h1>
+    <p>En la primera semana, cada estudiante convirtió su README de GitHub en su propia página con HTML y CSS. Explora la vista previa de cada sitio, activa los que quieras revisar y ábrelos todos juntos en pestañas nuevas.</p>
+    <div class="stats">
+      <span class="stat"><strong id="statTotal">0</strong> sitios</span>
+      <span class="stat"><strong>HTML</strong> + <strong>CSS</strong></span>
+      <span class="stat">Clases 1 – 4</span>
     </div>
-    <button type="button" id="selectAll">Seleccionar <span class="btn-text">visibles</span></button>
-    <button type="button" id="clearSel">Limpiar</button>
-    <button type="button" id="openBtn" class="btn-primary" disabled>Abrir en pestañas</button>
-    <span id="count" class="count" aria-live="polite"></span>
   </div>
+</header>
 
-  <p class="popup-note">
-    <strong>Tip:</strong> si el navegador bloquea las pestañas, permite las ventanas emergentes para esta página y vuelve a intentarlo.
-  </p>
+<div class="toolbar">
+  <div class="wrap">
+    <label class="search">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z"/></svg>
+      <input id="search" type="search" placeholder="Buscar por Discord o GitHub" autocomplete="off" aria-label="Buscar perfiles" />
+    </label>
+    <div class="segmented" role="group" aria-label="Vista">
+      <button type="button" data-view="grid" aria-pressed="true" title="Vista de cuadrícula" aria-label="Vista de cuadrícula">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5Zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5Zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5Zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5Z"/></svg>
+      </button>
+      <button type="button" data-view="list" aria-pressed="false" title="Vista de lista" aria-label="Vista de lista">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm3.75-1.5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5Zm0 5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5Zm0 5a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5ZM3 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0Zm-1 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
+<main class="wrap">
+  <p id="results" class="results-line" aria-live="polite"></p>
   <ul id="grid" class="grid"></ul>
   <p id="emptyState" class="empty-state hidden">Ningún perfil coincide con tu búsqueda.</p>
+</main>
+
+<div class="action-bar" id="actionBar">
+  <div class="wrap">
+    <p class="action-text" id="actionText" aria-live="polite"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="selectVisible">Activar visibles</button>
+      <button type="button" class="btn btn-primary" id="openBtn" disabled></button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -515,15 +657,17 @@
   const REPO_TREE = "https://github.com/glrodasz/academy/tree/main/exercises/semana-1/github-profiles/";
   const ICON_GITHUB = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
   const ICON_CODE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m11.28 3.22 4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L13.94 8l-3.72-3.72a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215Zm-6.56 0a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L2.06 8l3.72 3.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L.47 8.53a.75.75 0 0 1 0-1.06Z"/></svg>';
+  const ICON_EXTERNAL = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"/></svg>';
 
-  const gridEl = document.getElementById("grid");
-  const searchEl = document.getElementById("search");
-  const countEl = document.getElementById("count");
-  const openBtn = document.getElementById("openBtn");
-  const emptyState = document.getElementById("emptyState");
+  const $ = id => document.getElementById(id);
+  const gridEl = $("grid");
+  const searchEl = $("search");
+  const openBtn = $("openBtn");
+    const actionText = $("actionText");
   const viewButtons = document.querySelectorAll("[data-view]");
 
   const selected = new Set();
+  let blockedWarning = false;
   const siteUrl = folder => `./${encodeURIComponent(folder)}/index.html`;
 
   // Load each live preview only when its card scrolls near the viewport.
@@ -542,7 +686,7 @@
       setTimeout(reveal, 4000); // don't wait forever on slow third-party assets
       thumb.querySelector(".placeholder").after(iframe);
     });
-  }, { rootMargin: "400px 0px" });
+  }, { rootMargin: "600px 0px" });
 
   // Scale the 1280×800 previews down to the card width.
   const scaleObserver = new ResizeObserver(entries => {
@@ -550,104 +694,101 @@
     if (width) gridEl.style.setProperty("--scale", width / 1280);
   });
 
+  function el(tag, props = {}, ...children) {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children);
+    return node;
+  }
+
+  function externalLink(className, href, label) {
+    const a = el("a", { className, href, target: "_blank", rel: "noopener noreferrer" });
+    if (label) { a.title = label; a.setAttribute("aria-label", label); }
+    return a;
+  }
+
+  function iconLink(href, icon, label) {
+    const a = externalLink("icon-link", href, label);
+    a.innerHTML = icon;
+    return a;
+  }
+
   function createCard([folder, github]) {
-    const li = document.createElement("li");
-    li.className = "card";
+    const li = el("li", { className: "card" });
     li.dataset.search = `${folder} ${github ?? ""}`.toLowerCase();
 
-    const thumb = document.createElement("a");
-    thumb.className = "thumb";
-    thumb.href = siteUrl(folder);
-    thumb.target = "_blank";
-    thumb.rel = "noopener noreferrer";
+    const thumb = externalLink("thumb", siteUrl(folder), `Abrir el sitio de ${folder}`);
     thumb.dataset.folder = folder;
-    thumb.setAttribute("aria-label", `Abrir el sitio de ${folder}`);
-    thumb.innerHTML = `<span class="placeholder" aria-hidden="true"></span><span class="open-hint" aria-hidden="true">Abrir sitio ↗</span>`;
-    thumb.querySelector(".placeholder").textContent = folder.slice(0, 2).toUpperCase();
+    thumb.append(
+      el("span", { className: "placeholder", ariaHidden: "true", textContent: folder.slice(0, 2).toUpperCase() }),
+      el("span", { className: "badge-selected", ariaHidden: "true", textContent: "✓ En la lista" }),
+    );
 
-    const meta = document.createElement("div");
-    meta.className = "meta";
-
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.setAttribute("aria-label", `Seleccionar ${folder}`);
-    cb.addEventListener("change", () => {
-      cb.checked ? selected.add(folder) : selected.delete(folder);
-      li.classList.toggle("selected", cb.checked);
-      updateButton();
-    });
-    meta.append(cb);
-
+    const identity = el("div", { className: "identity" });
     if (github) {
-      const avatar = document.createElement("img");
-      avatar.className = "avatar";
-      avatar.src = `https://github.com/${github}.png?size=48`;
-      avatar.alt = "";
-      avatar.loading = "lazy";
-      avatar.width = avatar.height = 24;
+      const avatar = el("img", { className: "avatar", src: `https://github.com/${github}.png?size=64`, alt: "", loading: "lazy", width: 32, height: 32 });
       avatar.addEventListener("error", () => avatar.remove(), { once: true });
-      meta.append(avatar);
+      identity.append(avatar);
     }
-
-    const name = document.createElement("a");
-    name.className = "name";
-    name.href = siteUrl(folder);
-    name.target = "_blank";
-    name.rel = "noopener noreferrer";
+    const name = externalLink("name", siteUrl(folder));
     name.textContent = folder;
-    name.title = folder;
-    meta.append(name);
+    name.title = `Abrir el sitio de ${folder}`;
+    identity.append(el("div", { className: "names" },
+      name,
+      el("span", { className: "handle", textContent: github ? `@${github}` : "GitHub no encontrado" }),
+    ));
+    if (github) identity.append(iconLink(`https://github.com/${github}`, ICON_GITHUB, `Perfil de GitHub de @${github}`));
+    identity.append(iconLink(REPO_TREE + encodeURIComponent(folder), ICON_CODE, `Código fuente de ${folder}`));
 
-    if (github) {
-      meta.append(iconLink(`https://github.com/${github}`, ICON_GITHUB, `Perfil de GitHub de ${github}`, "github"));
-    }
-    meta.append(iconLink(REPO_TREE + encodeURIComponent(folder), ICON_CODE, `Código fuente de ${folder}`, "source"));
+    const input = el("input", { type: "checkbox" });
+    input.setAttribute("role", "switch");
+    input.addEventListener("change", () => toggle(li, folder, input.checked));
+    const switchLabel = el("label", { className: "switch" }, el("span", { textContent: "Abrir en pestaña" }), input);
 
-    li.append(thumb, meta);
+    li.append(thumb, el("div", { className: "card-body" }, identity, switchLabel));
     li._thumb = thumb;
-    li._checkbox = cb;
+    li._input = input;
+    li._folder = folder;
     return li;
   }
 
-  function iconLink(href, icon, label, cls) {
-    const a = document.createElement("a");
-    a.className = `icon-link ${cls}`;
-    a.href = href;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.title = label;
-    a.setAttribute("aria-label", label);
-    a.innerHTML = icon;
-    return a;
+  function toggle(card, folder, on) {
+    on ? selected.add(folder) : selected.delete(folder);
+    card._input.checked = on;
+    card.classList.toggle("selected", on);
+    blockedWarning = false;
+    updateActionBar();
   }
 
   const cards = profiles.map(createCard);
   gridEl.append(...cards);
   cards.forEach(card => previewObserver.observe(card._thumb));
   scaleObserver.observe(cards[0]._thumb);
+  $("statTotal").textContent = cards.length;
 
-  function visibleCards() {
-    return cards.filter(card => !card.classList.contains("hidden"));
-  }
+  const visibleCards = () => cards.filter(card => !card.classList.contains("hidden"));
 
   function applyFilter() {
     const q = searchEl.value.trim().toLowerCase();
     cards.forEach(card => card.classList.toggle("hidden", !!q && !card.dataset.search.includes(q)));
     const visible = visibleCards().length;
-    emptyState.classList.toggle("hidden", visible > 0);
-    countEl.textContent = visible === cards.length
-      ? `${cards.length} perfiles`
-      : `${visible} de ${cards.length} perfiles`;
+    $("emptyState").classList.toggle("hidden", visible > 0);
+    $("results").textContent = q
+      ? `${visible} de ${cards.length} sitios coinciden con “${searchEl.value.trim()}”`
+      : `Mostrando los ${cards.length} sitios`;
+    $("selectVisible").textContent = q ? `Activar ${visible}` : "Activar todos";
+    $("selectVisible").disabled = visible === 0;
   }
 
-  function updateButton() {
-    openBtn.disabled = selected.size === 0;
-    openBtn.textContent = selected.size > 0 ? `Abrir ${selected.size} en pestañas` : "Abrir en pestañas";
-  }
-
-  function setSelected(card, value) {
-    card._checkbox.checked = value;
-    card._checkbox.dispatchEvent(new Event("change"));
+  function updateActionBar() {
+    const n = selected.size;
+    openBtn.disabled = n === 0;
+    openBtn.innerHTML = `${ICON_EXTERNAL}<span>${n > 0 ? `Abrir ${n} ${n === 1 ? "pestaña" : "pestañas"}` : "Abrir en pestañas"}</span>`;
+    actionText.innerHTML = n > 0
+      ? `<strong>${n} ${n === 1 ? "sitio listo" : "sitios listos"}</strong> para abrir en pestañas nuevas. <button type="button" class="link-btn" id="clearSel">Limpiar</button>`
+      : "Activa <strong>“Abrir en pestaña”</strong> en los sitios que quieras revisar y ábrelos todos juntos aquí.";
+    if (blockedWarning) {
+      actionText.insertAdjacentHTML("beforeend", '<span class="warn">El navegador bloqueó algunas pestañas. Permite las ventanas emergentes para esta página y vuelve a intentarlo.</span>');
+    }
   }
 
   function setView(view) {
@@ -656,15 +797,27 @@
     try { localStorage.setItem("profiles-view", view); } catch {}
   }
 
-  document.getElementById("selectAll").addEventListener("click", () => visibleCards().forEach(c => setSelected(c, true)));
-  document.getElementById("clearSel").addEventListener("click", () => cards.forEach(c => c._checkbox.checked && setSelected(c, false)));
-  openBtn.addEventListener("click", () => selected.forEach(folder => window.open(siteUrl(folder), "_blank")));
+  $("selectVisible").addEventListener("click", () => visibleCards().forEach(c => toggle(c, c._folder, true)));
+  actionText.addEventListener("click", e => {
+    if (e.target.id === "clearSel") cards.forEach(c => c._input.checked && toggle(c, c._folder, false));
+  });
+  openBtn.addEventListener("click", () => {
+    let blocked = 0;
+    selected.forEach(folder => { if (!window.open(siteUrl(folder), "_blank")) blocked++; });
+    blockedWarning = blocked > 0;
+    updateActionBar();
+  });
   viewButtons.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
   searchEl.addEventListener("input", applyFilter);
+  new ResizeObserver(([entry]) => {
+    document.body.style.setProperty("--bar-h", `${entry.target.offsetHeight}px`);
+  }).observe($("actionBar"));
 
-  try { setView(localStorage.getItem("profiles-view") || "grid"); } catch { setView("grid"); }
+  let initialView = "grid";
+  try { initialView = localStorage.getItem("profiles-view") || "grid"; } catch {}
+  setView(initialView);
   applyFilter();
-  updateButton();
+  updateActionBar();
 </script>
 </body>
 </html>
