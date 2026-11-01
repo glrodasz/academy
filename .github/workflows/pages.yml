@@ -1,0 +1,60 @@
+name: Publish galleries to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "exercises/semana-1/github-profiles/**"
+      - ".github/workflows/pages.yml"
+      - ".github/scripts/check-github-profiles.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            exercises/semana-1/github-profiles
+            .github
+
+      - name: Check gallery list against student folders
+        run: node .github/scripts/check-github-profiles.js exercises/semana-1/github-profiles
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/semana-1
+          cp -R exercises/semana-1/github-profiles _site/semana-1/github-profiles
+          cat > _site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <meta charset="utf-8">
+          <meta name="robots" content="noindex, nofollow">
+          <meta http-equiv="refresh" content="0; url=semana-1/github-profiles/">
+          <title>undefined academy · Galerías</title>
+          <a href="semana-1/github-profiles/">Semana 1 · GitHub Profiles</a>
+          HTML
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}semana-1/github-profiles/
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

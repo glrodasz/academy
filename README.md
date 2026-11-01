@@ -169,7 +169,7 @@ En [`exercises/`](./exercises) encontrarás los ejercicios resueltos por los est
 
 | Carpeta | Descripción |
 |---------|-------------|
-| [semana-1](./exercises/semana-1) | Ejercicios de la semana 1 |
+| [semana-1](./exercises/semana-1) | Ejercicios de la semana 1 · 🌐 [Galería de GitHub Profiles](https://glrodasz.github.io/academy/semana-1/github-profiles/) |
 | [semana-2](./exercises/semana-2) | Ejercicios de la semana 2 |
 | [semana-3](./exercises/semana-3) | Ejercicios de la semana 3 |
 | [semana-4](./exercises/semana-4) | Ejercicios de la semana 4 |
