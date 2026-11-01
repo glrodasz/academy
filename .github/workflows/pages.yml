@@ -7,6 +7,7 @@ on:
       - "exercises/semana-1/github-profiles/**"
       - ".github/workflows/pages.yml"
       - ".github/scripts/check-github-profiles.js"
+      - ".github/scripts/fix-root-paths.js"
   workflow_dispatch:
 
 permissions:
@@ -35,6 +36,8 @@ jobs:
         run: |
           mkdir -p _site/semana-1
           cp -R exercises/semana-1/github-profiles _site/semana-1/github-profiles
+          # Student sites use root-absolute URLs ("/main.css"); point them at each student folder.
+          node .github/scripts/fix-root-paths.js _site/semana-1/github-profiles
           cat > _site/index.html <<'HTML'
           <!DOCTYPE html>
           <meta charset="utf-8">
