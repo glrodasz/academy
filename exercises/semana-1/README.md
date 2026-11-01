@@ -4,6 +4,8 @@
 
 Ejercicios de la primera semana.
 
+> 🌐 [Galería de GitHub Profiles](https://raw.githack.com/glrodasz/academy/main/exercises/semana-1/github-profiles/index.html) — vista previa de todos los sitios de `github-profiles`.
+
 ## 🏋Clase 1 [EJERCICIO]
 
  **Crear un Github Profile README** [1]

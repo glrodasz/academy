@@ -1,476 +1,670 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GitHub Profiles — Semana 1</title>
+  <meta name="description" content="Galería de los perfiles creados por los estudiantes de undefined academy en la Semana 1." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #21262d;
+      --border: #30363d;
+      --border-strong: #8b949e;
+      --text: #c9d1d9;
+      --text-strong: #f0f6fc;
+      --muted: #8b949e;
+      --faint: #484f58;
+      --accent: #58a6ff;
+      --success: #238636;
+      --success-strong: #2ea043;
+      --radius: 8px;
+      --thumb-w: 1280;
+      --thumb-h: 800;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 2rem 1rem;
     }
 
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #f0f6fc;
-      margin-bottom: 0.25rem;
-    }
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem 4rem; }
 
-    .subtitle {
-      font-size: 0.875rem;
-      color: #8b949e;
-      margin-bottom: 1.5rem;
-    }
+    header { margin-bottom: 1.25rem; }
+    h1 { font-size: 1.5rem; font-weight: 600; color: var(--text-strong); }
+    .subtitle { font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem; }
 
+    /* ---------- Toolbar ---------- */
     .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.625rem;
+      gap: 0.5rem;
       align-items: center;
+      padding: 0.75rem 0;
       margin-bottom: 1rem;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
     }
 
     #search {
-      flex: 1;
-      min-width: 180px;
+      flex: 1 1 220px;
+      min-width: 0;
       padding: 0.5rem 0.75rem;
-      background: #161b22;
-      border: 1px solid #30363d;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 6px;
-      color: #c9d1d9;
+      color: var(--text);
       font-size: 0.875rem;
-      outline: none;
     }
-    #search:focus { border-color: #58a6ff; }
-    #search::placeholder { color: #484f58; }
+    #search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgb(88 166 255 / 0.25); }
+    #search::placeholder { color: var(--faint); }
 
     button {
+      font: inherit;
       padding: 0.5rem 0.875rem;
       border-radius: 6px;
-      border: 1px solid #30363d;
+      border: 1px solid var(--border);
       font-size: 0.8125rem;
       cursor: pointer;
       white-space: nowrap;
+      background: var(--surface-2);
+      color: var(--text);
       transition: background 0.15s, border-color 0.15s;
     }
+    button:hover { background: var(--border); border-color: var(--border-strong); }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-    .btn-secondary {
-      background: #21262d;
-      color: #c9d1d9;
-    }
-    .btn-secondary:hover { background: #30363d; border-color: #8b949e; }
+    .segmented { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .segmented button { border: 0; border-radius: 0; background: transparent; color: var(--muted); }
+    .segmented button + button { border-left: 1px solid var(--border); }
+    .segmented button[aria-pressed="true"] { background: var(--surface-2); color: var(--text-strong); }
 
     .btn-primary {
-      background: #238636;
+      background: var(--success);
       color: #fff;
-      border-color: #2ea043;
+      border-color: var(--success-strong);
       font-weight: 600;
     }
-    .btn-primary:hover { background: #2ea043; }
-    .btn-primary:disabled {
-      background: #21262d;
-      color: #484f58;
-      border-color: #30363d;
-      cursor: not-allowed;
-    }
+    .btn-primary:hover { background: var(--success-strong); border-color: var(--success-strong); }
+    .btn-primary:disabled { background: var(--surface-2); color: var(--faint); border-color: var(--border); cursor: not-allowed; }
 
-    .count {
-      font-size: 0.8125rem;
-      color: #8b949e;
-      margin-left: auto;
-    }
+    .count { font-size: 0.8125rem; color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
 
-    .popup-note {
-      font-size: 0.75rem;
-      color: #8b949e;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      margin-bottom: 1rem;
-    }
+    .popup-note { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
     .popup-note strong { color: #e3b341; }
 
-    ul {
+    /* ---------- Grid view ---------- */
+    .grid {
       list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
     }
+    .card:hover { border-color: var(--border-strong); transform: translateY(-2px); box-shadow: 0 8px 24px rgb(0 0 0 / 0.4); }
+    .card.selected { border-color: var(--success-strong); box-shadow: 0 0 0 1px var(--success-strong); }
 
-    li {
+    .thumb {
+      position: relative;
+      display: block;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+    .thumb iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: calc(var(--thumb-w) * 1px);
+      height: calc(var(--thumb-h) * 1px);
+      border: 0;
+      transform: scale(var(--scale, 0.2));
+      transform-origin: 0 0;
+      pointer-events: none;
+      background: #fff;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .thumb.loaded iframe { opacity: 1; }
+    .thumb .placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--faint);
+      background: linear-gradient(110deg, var(--surface) 40%, var(--surface-2) 50%, var(--surface) 60%) 0 0 / 200% 100%;
+      animation: shimmer 1.4s linear infinite;
+    }
+    .thumb.loaded .placeholder { animation: none; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .thumb .open-hint {
+      position: absolute;
+      z-index: 1;
+      right: 0.5rem;
+      bottom: 0.5rem;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      color: #fff;
+      background: rgb(13 17 23 / 0.85);
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .card:hover .open-hint, .thumb:focus-visible .open-hint { opacity: 1; }
+
+    .meta {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.4rem 0.75rem;
-      border-radius: 6px;
-      border: 1px solid transparent;
-      transition: background 0.1s, border-color 0.1s;
+      gap: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      min-width: 0;
     }
-    li:hover { background: #161b22; border-color: #30363d; }
+    .meta input[type="checkbox"] { width: 15px; height: 15px; flex-shrink: 0; accent-color: var(--success-strong); cursor: pointer; }
 
-    li input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
+    .avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
       flex-shrink: 0;
-      accent-color: #2ea043;
-      cursor: pointer;
+      background: var(--surface-2);
+      object-fit: cover;
     }
 
-    li a {
-      color: #58a6ff;
-      text-decoration: none;
-      font-size: 0.875rem;
+    .name {
       flex: 1;
+      min-width: 0;
+      font-size: 0.875rem;
+      color: var(--text-strong);
+      text-decoration: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    li a:hover { text-decoration: underline; }
+    .name:hover { color: var(--accent); text-decoration: underline; }
+
+    .icon-link {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      color: var(--muted);
+      border-radius: 6px;
+    }
+    .icon-link:hover { color: var(--text-strong); background: var(--surface-2); }
+    .icon-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ---------- List view ---------- */
+    .grid.list { grid-template-columns: 1fr; gap: 2px; }
+    .grid.list .card { flex-direction: row; background: transparent; border-color: transparent; transform: none; box-shadow: none; }
+    .grid.list .card:hover { background: var(--surface); border-color: var(--border); }
+    .grid.list .card.selected { border-color: var(--success-strong); }
+    .grid.list .thumb { display: none; }
+    .grid.list .meta { flex: 1; padding: 0.35rem 0.75rem; }
 
     .hidden { display: none !important; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.875rem; }
 
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #484f58;
-      font-size: 0.875rem;
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.75rem; }
+      .meta { padding: 0.5rem; gap: 0.375rem; }
+      .grid:not(.list) .meta .icon-link { display: none; }
+      .count { width: 100%; margin-left: 0; order: 10; }
+      .toolbar .btn-text { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .thumb .placeholder { transition: none; animation: none; }
+      .card:hover { transform: none; }
     }
   </style>
 </head>
 <body>
+<div class="wrap">
+  <header>
+    <h1>GitHub Profiles</h1>
+    <p class="subtitle">Semana 1 — perfiles creados por los estudiantes de undefined academy</p>
+  </header>
 
-<h1>GitHub Profiles</h1>
-<p class="subtitle">Semana 1 — student submissions</p>
+  <div class="toolbar" role="toolbar" aria-label="Filtros y acciones">
+    <input id="search" type="search" placeholder="Buscar perfiles…" autocomplete="off" aria-label="Buscar perfiles" />
+    <div class="segmented" role="group" aria-label="Vista">
+      <button type="button" data-view="grid" aria-pressed="true">Grid</button>
+      <button type="button" data-view="list" aria-pressed="false">Lista</button>
+    </div>
+    <button type="button" id="selectAll">Seleccionar <span class="btn-text">visibles</span></button>
+    <button type="button" id="clearSel">Limpiar</button>
+    <button type="button" id="openBtn" class="btn-primary" disabled>Abrir en pestañas</button>
+    <span id="count" class="count" aria-live="polite"></span>
+  </div>
 
-<div class="toolbar">
-  <input id="search" type="search" placeholder="Filter profiles…" autocomplete="off" />
-  <button class="btn-secondary" onclick="selectAll()">Select all</button>
-  <button class="btn-secondary" onclick="deselectAll()">Deselect all</button>
-  <button id="openBtn" class="btn-primary" onclick="openTabs()" disabled>Open selected in tabs</button>
-  <span id="count" class="count"></span>
+  <p class="popup-note">
+    <strong>Tip:</strong> si el navegador bloquea las pestañas, permite las ventanas emergentes para esta página y vuelve a intentarlo.
+  </p>
+
+  <ul id="grid" class="grid"></ul>
+  <p id="emptyState" class="empty-state hidden">Ningún perfil coincide con tu búsqueda.</p>
 </div>
 
-<p class="popup-note">
-  <strong>Tip:</strong> If your browser blocks the tabs, click the popup-blocked icon in the address bar and allow popups for this page, then try again.
-</p>
-
-<ul id="list"></ul>
-<p id="emptyState" class="empty-state hidden">No profiles match your search.</p>
-
 <script>
-  const folders = [
-    "7thalex-1191",
-    "aa2d-7694",
-    "aabrazo-8279",
-    "achequisde-5168",
-    "adjsvar-8685",
-    "AETERNUS-9050",
-    "aitorias-9443",
-    "akoo1982-7735",
-    "alejoreyv9-0539",
-    "Aleps-5699",
-    "alex_aponte-4195",
-    "alexcaiced0-3094",
-    "AlexMGonzalez-6883",
-    "alifm-2843",
-    "Anaid Urióstegui S(dot)-9310",
-    "andrealarroza-3697",
-    "andresce-5981",
-    "Andresxd10-5559",
-    "andrssnsdc-4799",
-    "Angel-Mijares-3276",
-    "Aqward#5462",
-    "arzeus17-4122",
-    "atadsd-7852",
-    "augaldecr-4610",
-    "basko79-1418",
-    "BimoPRO_gameYT-9310",
-    "BingenWeb-5101",
-    "bR-3929",
-    "brianbr-3719",
-    "Bruno33-5772",
-    "Bryan_Ortega_Plata-1009",
-    "byRokii-3761",
-    "Byron-8971",
-    "caesara20-9814",
-    "caffa-4633",
-    "CamilaSilva#7352",
-    "camilo-acevedo-9421",
-    "camilol-1734",
-    "Carolina08001-6984",
-    "cescode-0914",
-    "crbm456-0270",
-    "CristhianMedina-7460",
-    "cristianpb-4535",
-    "d4vidwp-3213",
-    "Dali-7656",
-    "DaliaCR-5299",
-    "DameAsado-6873",
-    "Danielisho-3816",
-    "dario-ernesto-roca-7375",
-    "delospp-7916",
-    "denisse-9285",
-    "DevidH092101-6070",
-    "dfrestrepo-1489",
-    "dhdarken-5806",
-    "Diego-3282",
-    "diegol-1905",
-    "diirfv-7677",
-    "dilsonalfonso-9732",
-    "dlopeez-1132",
-    "Dr(dot)Lack47-4891",
-    "dynamite-4370",
-    "eavg-1634",
-    "El Bicho-5067",
-    "emporto95-7729",
-    "Ender26-3118",
-    "Enmanuel-8754",
-    "equiman-0343",
-    "ernzxr-2086",
-    "esandresaristi-5768",
-    "EverJM-6591",
-    "Ewincas-2746",
-    "EzequielCaste-9004",
-    "facundo91-1495",
-    "Fede(dot)GC-5692",
-    "fjquant-2458",
-    "Floor-3100",
-    "Franbichego-0028",
-    "FrankCasanova-2182",
-    "franman-6631",
-    "freivys-4974",
-    "gab-3881",
-    "gabi_gg-6394",
-    "GabrielObregon-7536",
-    "GariCarandai-2859",
-    "gaston-0280",
-    "Gaston095-2770",
-    "Gatz_gg-1050",
-    "ggomezr-8022",
-    "giocompany-3094",
-    "giovani-4566",
-    "giub-7914",
-    "GuishePR-6376",
-    "gustavo(dot)arana-6562",
-    "haboufaker-8509",
-    "hardstone-3508",
-    "hcofanelli-9792",
-    "HernanBautista-7481",
-    "hsalvadorgz-6132",
-    "IDKJesBen-9115",
-    "iik_brightside-0389",
-    "ImNotStefano-2457",
-    "INGCapaDev-8510",
-    "IngFelipeSolarte-3451",
-    "IRatten-5791",
-    "IvanFelipe-3478",
-    "ixam-1702",
-    "jaardila-4569",
-    "jayler-1407",
-    "jcdelrioe-5476",
-    "JeremyO-7130",
-    "Jessbel-7277",
-    "Joaquin-Esteban-2337",
-    "JoeOs-8843",
-    "Joha1701-9119",
-    "Johan-Jimenez-4558",
-    "Johans-2787",
-    "JonatanGarcia-2522",
-    "Jorem999-5406",
-    "jorgemr85-3672",
-    "JorgeVillafraz-6924",
-    "Jose C(dot) Barahona-1862",
-    "Jose-Camilo-8399",
-    "joséandrésgavilanes(smileyyy)-6269",
-    "JoseHerrera-9309",
-    "joshuaRoberts-0458",
-    "jrv_dev",
-    "Juan_Camilo_Loaiza_Penaranda-4852",
-    "juanfelipecaraballo-6690",
-    "juanmifer72-5949",
-    "juanmiyo0696-3317",
-    "juanssanchez-6134",
-    "julietalazzaro-2083",
-    "kanshh_-3254",
-    "karo26-9917",
-    "Karu-1655",
-    "Kick-Off-2479",
-    "kiltro-dev-2143",
-    "kjimenezr89-3718",
-    "knenita-8228",
-    "KnivesMillions-2975",
-    "Krinpyk-7419",
-    "laurelone-6335",
-    "ldrl96-4388",
-    "leal2-6465",
-    "Leonardo Pintor-6833",
-    "Lian-0550",
-    "Lili-3546",
-    "lllariogonzalez-2692",
-    "lmendev-2708",
-    "luanarmo-7586",
-    "LuciaAldana-5957",
-    "lucianogarriga-1264",
-    "Lugim-4737",
-    "luisdgamaya-3698",
-    "Luisponce-8843",
-    "lujan02-9250",
-    "lybauber-1569",
-    "Mac-9025",
-    "Maikcol-2796",
-    "Manuel-Guzman-0345",
-    "manuel77-7331",
-    "ManuelPryda-7878",
-    "Marcos(dot)-0222",
-    "MariaSolArroyo-9830",
-    "MarisolSalazarV-6177",
-    "markos-6727",
-    "Martinezm-2263",
-    "MartinVargas-6047",
-    "Masaru-3255",
-    "Matiascba27-8994",
-    "matidasilva145-1999",
-    "matii-6489",
-    "Matilayo-0663",
-    "Mau-5427",
-    "Mfassi-2651",
-    "Michel890-0152",
-    "monh-6851",
-    "MrRedu-7518",
-    "murquis-5340",
-    "Nathaly-3079",
-    "natsumychan-4117",
-    "Nbarbetti-6907",
-    "nencodev-9495",
-    "nicolas-52000",
-    "NicoleU-3996",
-    "NicoovLamperouge-893",
-    "nicopercivale-3043",
-    "Noa_S-5163",
-    "nohiria-9088",
-    "olezdev-5018",
-    "Oscar Terceros-1377",
-    "PabloXD-4695",
-    "pacorro-8888",
-    "pagliuca-6408",
-    "Pancratzia-4189",
-    "pantu-3796",
-    "PaulaChaneton-2365",
-    "PaulaQuiroga-8406",
-    "PedroLP-1935",
-    "PeKe-4001",
-    "percivv-5104",
-    "Pinto_O-5620",
-    "pioxscorpio94-0264",
-    "r4vc31-7548",
-    "rafitaruiz-4558",
-    "Ramo-9888",
-    "Raquel_Burgos-Full_Stack-2874",
-    "ricardocai92-2995",
-    "Romeo_Zulu-8290",
-    "Romina-2621",
-    "Ronald-9291",
-    "rrodriguezca-2238",
-    "Santiago-3437",
-    "SantiagoZ013-5300",
-    "sebas-9553",
-    "sebasrico-3054",
-    "Seujumon-1612",
-    "Sheila_FG-7067",
-    "Sorxa-9612",
-    "sugar-5500",
-    "taliixer-8876",
-    "TeamPanda-5141",
-    "tefis96-9675",
-    "tigret0n-6769",
-    "truquinio-8306",
-    "valitogt-1328",
-    "Vene15-3355",
-    "voldy-0445",
-    "wil-6448",
-    "Wilmer-8071",
-    "Yaani-8367",
-    "yair-1956",
-    "Yessy-2278",
-    "YilmerG-4850",
-    "Yiyeh-5309",
-    "Yolcar-7642",
-    "yukiko-3634",
-    "zucer-8998",
+  // [discord folder, github username | null]
+  const profiles = [
+    ["7thalex-1191", "alexpintodiaz"],
+    ["aa2d-7694", "andrealvarez2d"],
+    ["aabrazo-8279", "aabrazo"],
+    ["achequisde-5168", "achequisde"],
+    ["adjsvar-8685", "adjsvar"],
+    ["AETERNUS-9050", "Aeternus185"],
+    ["aitorias-9443", "aitorias"],
+    ["akoo1982-7735", "igor-lobo-alonso"],
+    ["alejoreyv9-0539", "JacobyRey"],
+    ["Aleps-5699", "Alepsss"],
+    ["alex_aponte-4195", "alex-aponte"],
+    ["alexcaiced0-3094", "alexcaicedo"],
+    ["AlexMGonzalez-6883", "alexgonza278"],
+    ["alifm-2843", "AliannaFormoso"],
+    ["Anaid Urióstegui S(dot)-9310", "AnaidUS"],
+    ["andrealarroza-3697", "andrealarroza"],
+    ["andresce-5981", "CardonaEA"],
+    ["Andresxd10-5559", "andresxd1020"],
+    ["andrssnsdc-4799", "andrssnsdc"],
+    ["Angel-Mijares-3276", "angelmijarees"],
+    ["Aqward#5462", null],
+    ["arzeus17-4122", "Arzeus17"],
+    ["atadsd-7852", null],
+    ["augaldecr-4610", "anuraghazra"],
+    ["basko79-1418", "basco1979"],
+    ["BimoPRO_gameYT-9310", "Bilal-Moussaoui"],
+    ["BingenWeb-5101", null],
+    ["bR-3929", "bEERRE96"],
+    ["brianbr-3719", "brianbrallard"],
+    ["Bruno33-5772", "brunom033"],
+    ["Bryan_Ortega_Plata-1009", "brayortepla12"],
+    ["byRokii-3761", "byRokii"],
+    ["Byron-8971", "Byron2016"],
+    ["caesara20-9814", "CaesarAlej24"],
+    ["caffa-4633", "OrcaCl"],
+    ["CamilaSilva#7352", "camilasilvab"],
+    ["camilo-acevedo-9421", "k4dm3l"],
+    ["camilol-1734", "camilol1021"],
+    ["Carolina08001-6984", "Lunisa202"],
+    ["cescode-0914", "cesaralarcondev"],
+    ["crbm456-0270", "crbm456"],
+    ["CristhianMedina-7460", "Cristhian-Medina"],
+    ["cristianpb-4535", "Cristianp9927"],
+    ["d4vidwp-3213", "davidacs10"],
+    ["Dali-7656", "Dalianaguirre"],
+    ["DaliaCR-5299", "cramdal"],
+    ["DameAsado-6873", "Wannmi"],
+    ["Danielisho-3816", "Danielisho"],
+    ["dario-ernesto-roca-7375", "darioernesto-roca"],
+    ["delospp-7916", null],
+    ["denisse-9285", "DenisseMonster"],
+    ["DevidH092101-6070", "davidherrera0921"],
+    ["dfrestrepo-1489", "chapurestrepo"],
+    ["dhdarken-5806", "dhdarken"],
+    ["Diego-3282", "restre17"],
+    ["diegol-1905", "matipe1"],
+    ["diirfv-7677", "diirf"],
+    ["dilsonalfonso-9732", "dilsonalfonso"],
+    ["dlopeez-1132", "dloopezz"],
+    ["Dr(dot)Lack47-4891", "DrLack47"],
+    ["dynamite-4370", "dlozanoc82"],
+    ["eavg-1634", "esmelinantonio"],
+    ["El Bicho-5067", null],
+    ["emporto95-7729", "eduardojavier95"],
+    ["Ender26-3118", "Ender96"],
+    ["Enmanuel-8754", "Enmanuelt2"],
+    ["equiman-0343", "equiman"],
+    ["ernzxr-2086", "ernzxr"],
+    ["esandresaristi-5768", "andresarioro"],
+    ["EverJM-6591", "everjm0128"],
+    ["Ewincas-2746", "Edcast10"],
+    ["EzequielCaste-9004", "EzequielCaste"],
+    ["facundo91-1495", "facu1391"],
+    ["Fede(dot)GC-5692", "fedegomezc"],
+    ["fjquant-2458", "fjquants"],
+    ["Floor-3100", "floor096"],
+    ["Franbichego-0028", "FranBichego"],
+    ["FrankCasanova-2182", "fgcas"],
+    ["franman-6631", "fmanzano26"],
+    ["freivys-4974", "FreivysDev"],
+    ["gab-3881", "ga-b0"],
+    ["gabi_gg-6394", "gonzalez-gabriel"],
+    ["GabrielObregon-7536", "gabobregon89"],
+    ["GariCarandai-2859", "adrian-gg"],
+    ["gaston-0280", "gaston-R"],
+    ["Gaston095-2770", "Gaston095"],
+    ["Gatz_gg-1050", null],
+    ["ggomezr-8022", "ggomez1403"],
+    ["giocompany-3094", null],
+    ["giovani-4566", "Giohero"],
+    ["giub-7914", "gurrutia15"],
+    ["GuishePR-6376", "GuishePR"],
+    ["gustavo(dot)arana-6562", "gustavo-arana"],
+    ["haboufaker-8509", "haboufaker"],
+    ["hardstone-3508", "hardstonepaul"],
+    ["hcofanelli-9792", "Hcofanelli"],
+    ["HernanBautista-7481", "Hernan4280"],
+    ["hsalvadorgz-6132", "HeynerSalvador"],
+    ["IDKJesBen-9115", "idkjesben"],
+    ["iik_brightside-0389", "Victoria-Brightside"],
+    ["ImNotStefano-2457", "StefanMiranda"],
+    ["INGCapaDev-8510", "INGCapaDev"],
+    ["IngFelipeSolarte-3451", "nanpipe"],
+    ["IRatten-5791", "DanRev"],
+    ["IvanFelipe-3478", "IvanVilte"],
+    ["ixam-1702", "yulsdev"],
+    ["jaardila-4569", "jaardila-3"],
+    ["jayler-1407", "jayler0203"],
+    ["jcdelrioe-5476", "jcdelrioe"],
+    ["JeremyO-7130", "Jejorm"],
+    ["Jessbel-7277", "jesab3l"],
+    ["Joaquin-Esteban-2337", "joaquinesteban"],
+    ["JoeOs-8843", "JoeOsG"],
+    ["Joha1701-9119", "JohaIles"],
+    ["Johan-Jimenez-4558", "jsebas2220"],
+    ["Johans-2787", "Snahoj"],
+    ["JonatanGarcia-2522", "jgarcia-alt"],
+    ["Jorem999-5406", "Jorem999"],
+    ["jorgemr85-3672", "jmendezr85"],
+    ["JorgeVillafraz-6924", "jorge9372"],
+    ["Jose C(dot) Barahona-1862", "jcbatwork"],
+    ["Jose-Camilo-8399", "JoseCamilo84"],
+    ["joséandrésgavilanes(smileyyy)-6269", "joseandresgavilanes"],
+    ["JoseHerrera-9309", "joseherreraa1"],
+    ["joshuaRoberts-0458", "joshuaco"],
+    ["jrv_dev", "jrv-dev"],
+    ["Juan_Camilo_Loaiza_Penaranda-4852", "jucalp21"],
+    ["juanfelipecaraballo-6690", "juanfelipecaraballo"],
+    ["juanmifer72-5949", "Juanmi72"],
+    ["juanmiyo0696-3317", "Juanmiyo0696"],
+    ["juanssanchez-6134", "juanssanchezv"],
+    ["julietalazzaro-2083", "julietalazzaro"],
+    ["kanshh_-3254", "Diegu32"],
+    ["karo26-9917", "Karomogo26"],
+    ["Karu-1655", "ragomezm"],
+    ["Kick-Off-2479", null],
+    ["kiltro-dev-2143", "kiltro-dev"],
+    ["kjimenezr89-3718", "kjimenezr89"],
+    ["knenita-8228", "DianaRussi"],
+    ["KnivesMillions-2975", "Christian-356739"],
+    ["Krinpyk-7419", "Manulopsan"],
+    ["laurelone-6335", "laurelone21"],
+    ["ldrl96-4388", "ldrl"],
+    ["leal2-6465", "Lealdos"],
+    ["Leonardo Pintor-6833", "pintor32"],
+    ["Lian-0550", "cristinacdm"],
+    ["Lili-3546", "LiliaG-hiramatsu"],
+    ["lllariogonzalez-2692", "lllariogonzalez"],
+    ["lmendev-2708", "Lmendev"],
+    ["luanarmo-7586", "luanarmo"],
+    ["LuciaAldana-5957", "luciaaldana"],
+    ["lucianogarriga-1264", "lucianogarriga"],
+    ["Lugim-4737", "Legnaleugim"],
+    ["luisdgamaya-3698", "Luisdgamaya"],
+    ["Luisponce-8843", "PMLFDev"],
+    ["lujan02-9250", "javilujan2"],
+    ["lybauber-1569", "lybauber"],
+    ["Mac-9025", "MrAlizarinCrimson"],
+    ["Maikcol-2796", "Alexis033"],
+    ["Manuel-Guzman-0345", "maguz727"],
+    ["manuel77-7331", "manuelmannuel"],
+    ["ManuelPryda-7878", "manuelpryda"],
+    ["Marcos(dot)-0222", "crungead"],
+    ["MariaSolArroyo-9830", "MariaSolArroyo"],
+    ["MarisolSalazarV-6177", "marisolSv22"],
+    ["markos-6727", "mhrosariom"],
+    ["Martinezm-2263", "Martinezmarianocv"],
+    ["MartinVargas-6047", "MartinRodrigoVargas"],
+    ["Masaru-3255", "Hincapie-OscarH"],
+    ["Matiascba27-8994", "Matiascba27"],
+    ["matidasilva145-1999", "matidsv"],
+    ["matii-6489", "matiioj"],
+    ["Matilayo-0663", "Matipela"],
+    ["Mau-5427", "MauBedoya"],
+    ["Mfassi-2651", "Mfassi96"],
+    ["Michel890-0152", "miche890"],
+    ["monh-6851", null],
+    ["MrRedu-7518", "MrRedu"],
+    ["murquis-5340", "marcospenalosa"],
+    ["Nathaly-3079", null],
+    ["natsumychan-4117", "Natsumychan"],
+    ["Nbarbetti-6907", "nbarbettim"],
+    ["nencodev-9495", "nencodev"],
+    ["nicolas-52000", "puennico"],
+    ["NicoleU-3996", "Nicolina10"],
+    ["NicoovLamperouge-893", "Nicoov"],
+    ["nicopercivale-3043", "nicolaspercivale"],
+    ["Noa_S-5163", "NoaSalgado"],
+    ["nohiria-9088", "nohiria"],
+    ["olezdev-5018", "olezdev"],
+    ["Oscar Terceros-1377", "OscarTerceros"],
+    ["PabloXD-4695", "pablo-alex"],
+    ["pacorro-8888", "pacorroX"],
+    ["pagliuca-6408", "Alexander-Solis-Brenes"],
+    ["Pancratzia-4189", "Pancratzia"],
+    ["pantu-3796", "agusaudejaud"],
+    ["PaulaChaneton-2365", "mpchaneton"],
+    ["PaulaQuiroga-8406", "QuirogaPau"],
+    ["PedroLP-1935", "Pedro-Alp"],
+    ["PeKe-4001", "rdjgl24"],
+    ["percivv-5104", "Matiaspercivale2001"],
+    ["Pinto_O-5620", "alh3x"],
+    ["pioxscorpio94-0264", "Pioxscorpio"],
+    ["r4vc31-7548", "r4vc31"],
+    ["rafitaruiz-4558", "rafaelruizdev"],
+    ["Ramo-9888", "RamaUB"],
+    ["Raquel_Burgos-Full_Stack-2874", "rachelbq"],
+    ["ricardocai92-2995", "gutierrezricardo92"],
+    ["Romeo_Zulu-8290", "Romeo-Zulu"],
+    ["Romina-2621", "RomiCode"],
+    ["Ronald-9291", "RBree75"],
+    ["rrodriguezca-2238", "rrodriguezca"],
+    ["Santiago-3437", "oconsl"],
+    ["SantiagoZ013-5300", "SantiagoZ13"],
+    ["sebas-9553", "sebasvalencia"],
+    ["sebasrico-3054", "sebasricop"],
+    ["Seujumon-1612", "Seujumon"],
+    ["Sheila_FG-7067", "sheifg"],
+    ["Sorxa-9612", "Sorx4s"],
+    ["sugar-5500", "criislopeez"],
+    ["taliixer-8876", null],
+    ["TeamPanda-5141", "DivPanda"],
+    ["tefis96-9675", "StephanyCS1"],
+    ["tigret0n-6769", null],
+    ["truquinio-8306", "truquinio"],
+    ["valitogt-1328", "Valitogt79"],
+    ["Vene15-3355", "Vene15"],
+    ["voldy-0445", "carlotagadel"],
+    ["wil-6448", "nobody-redhawk"],
+    ["Wilmer-8071", "DevOld112"],
+    ["Yaani-8367", "Yanina-Unrein"],
+    ["yair-1956", "yeiror"],
+    ["Yessy-2278", "ycastaneda1"],
+    ["YilmerG-4850", "yrguativa"],
+    ["Yiyeh-5309", "Yiyeh"],
+    ["Yolcar-7642", "Yolcar"],
+    ["yukiko-3634", "kasumita"],
+    ["zucer-8998", "zucerkia"],
   ];
 
-  const listEl = document.getElementById("list");
+  const REPO_TREE = "https://github.com/glrodasz/academy/tree/main/exercises/semana-1/github-profiles/";
+  const ICON_GITHUB = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>';
+  const ICON_CODE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m11.28 3.22 4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L13.94 8l-3.72-3.72a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215Zm-6.56 0a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042L2.06 8l3.72 3.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L.47 8.53a.75.75 0 0 1 0-1.06Z"/></svg>';
+
+  const gridEl = document.getElementById("grid");
   const searchEl = document.getElementById("search");
   const countEl = document.getElementById("count");
   const openBtn = document.getElementById("openBtn");
   const emptyState = document.getElementById("emptyState");
+  const viewButtons = document.querySelectorAll("[data-view]");
 
-  function buildList() {
-    listEl.innerHTML = "";
-    const q = searchEl.value.trim().toLowerCase();
-    const visible = q ? folders.filter(f => f.toLowerCase().includes(q)) : folders;
+  const selected = new Set();
+  const siteUrl = folder => `./${encodeURIComponent(folder)}/index.html`;
 
-    visible.forEach(name => {
-      const li = document.createElement("li");
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.dataset.folder = name;
-      cb.addEventListener("change", updateButton);
-
-      const a = document.createElement("a");
-      a.href = `./${encodeURIComponent(name)}/index.html`;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = name;
-
-      li.appendChild(cb);
-      li.appendChild(a);
-      listEl.appendChild(li);
+  // Load each live preview only when its card scrolls near the viewport.
+  const previewObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const thumb = entry.target;
+      previewObserver.unobserve(thumb);
+      const iframe = document.createElement("iframe");
+      iframe.src = thumb.href;
+      iframe.title = `Vista previa de ${thumb.dataset.folder}`;
+      iframe.tabIndex = -1;
+      iframe.setAttribute("sandbox", ""); // no scripts, alerts or audio in previews
+      const reveal = () => thumb.classList.add("loaded");
+      iframe.addEventListener("load", reveal, { once: true });
+      setTimeout(reveal, 4000); // don't wait forever on slow third-party assets
+      thumb.querySelector(".placeholder").after(iframe);
     });
+  }, { rootMargin: "400px 0px" });
 
-    emptyState.classList.toggle("hidden", visible.length > 0);
-    updateCount(visible.length);
-    updateButton();
+  // Scale the 1280×800 previews down to the card width.
+  const scaleObserver = new ResizeObserver(entries => {
+    const width = entries[0].contentRect.width;
+    if (width) gridEl.style.setProperty("--scale", width / 1280);
+  });
+
+  function createCard([folder, github]) {
+    const li = document.createElement("li");
+    li.className = "card";
+    li.dataset.search = `${folder} ${github ?? ""}`.toLowerCase();
+
+    const thumb = document.createElement("a");
+    thumb.className = "thumb";
+    thumb.href = siteUrl(folder);
+    thumb.target = "_blank";
+    thumb.rel = "noopener noreferrer";
+    thumb.dataset.folder = folder;
+    thumb.setAttribute("aria-label", `Abrir el sitio de ${folder}`);
+    thumb.innerHTML = `<span class="placeholder" aria-hidden="true"></span><span class="open-hint" aria-hidden="true">Abrir sitio ↗</span>`;
+    thumb.querySelector(".placeholder").textContent = folder.slice(0, 2).toUpperCase();
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.setAttribute("aria-label", `Seleccionar ${folder}`);
+    cb.addEventListener("change", () => {
+      cb.checked ? selected.add(folder) : selected.delete(folder);
+      li.classList.toggle("selected", cb.checked);
+      updateButton();
+    });
+    meta.append(cb);
+
+    if (github) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar";
+      avatar.src = `https://github.com/${github}.png?size=48`;
+      avatar.alt = "";
+      avatar.loading = "lazy";
+      avatar.width = avatar.height = 24;
+      avatar.addEventListener("error", () => avatar.remove(), { once: true });
+      meta.append(avatar);
+    }
+
+    const name = document.createElement("a");
+    name.className = "name";
+    name.href = siteUrl(folder);
+    name.target = "_blank";
+    name.rel = "noopener noreferrer";
+    name.textContent = folder;
+    name.title = folder;
+    meta.append(name);
+
+    if (github) {
+      meta.append(iconLink(`https://github.com/${github}`, ICON_GITHUB, `Perfil de GitHub de ${github}`, "github"));
+    }
+    meta.append(iconLink(REPO_TREE + encodeURIComponent(folder), ICON_CODE, `Código fuente de ${folder}`, "source"));
+
+    li.append(thumb, meta);
+    li._thumb = thumb;
+    li._checkbox = cb;
+    return li;
   }
 
-  function updateCount(visibleCount) {
-    const total = folders.length;
-    countEl.textContent = visibleCount === total
-      ? `${total} profiles`
-      : `${visibleCount} of ${total} profiles`;
+  function iconLink(href, icon, label, cls) {
+    const a = document.createElement("a");
+    a.className = `icon-link ${cls}`;
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.title = label;
+    a.setAttribute("aria-label", label);
+    a.innerHTML = icon;
+    return a;
+  }
+
+  const cards = profiles.map(createCard);
+  gridEl.append(...cards);
+  cards.forEach(card => previewObserver.observe(card._thumb));
+  scaleObserver.observe(cards[0]._thumb);
+
+  function visibleCards() {
+    return cards.filter(card => !card.classList.contains("hidden"));
+  }
+
+  function applyFilter() {
+    const q = searchEl.value.trim().toLowerCase();
+    cards.forEach(card => card.classList.toggle("hidden", !!q && !card.dataset.search.includes(q)));
+    const visible = visibleCards().length;
+    emptyState.classList.toggle("hidden", visible > 0);
+    countEl.textContent = visible === cards.length
+      ? `${cards.length} perfiles`
+      : `${visible} de ${cards.length} perfiles`;
   }
 
   function updateButton() {
-    const checked = listEl.querySelectorAll("input[type=checkbox]:checked").length;
-    openBtn.disabled = checked === 0;
-    openBtn.textContent = checked > 0
-      ? `Open ${checked} selected in tabs`
-      : "Open selected in tabs";
+    openBtn.disabled = selected.size === 0;
+    openBtn.textContent = selected.size > 0 ? `Abrir ${selected.size} en pestañas` : "Abrir en pestañas";
   }
 
-  function selectAll() {
-    listEl.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = true);
-    updateButton();
+  function setSelected(card, value) {
+    card._checkbox.checked = value;
+    card._checkbox.dispatchEvent(new Event("change"));
   }
 
-  function deselectAll() {
-    listEl.querySelectorAll("input[type=checkbox]").forEach(cb => cb.checked = false);
-    updateButton();
+  function setView(view) {
+    gridEl.classList.toggle("list", view === "list");
+    viewButtons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+    try { localStorage.setItem("profiles-view", view); } catch {}
   }
 
-  function openTabs() {
-    listEl.querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
-      window.open(`./${encodeURIComponent(cb.dataset.folder)}/index.html`, "_blank");
-    });
-  }
+  document.getElementById("selectAll").addEventListener("click", () => visibleCards().forEach(c => setSelected(c, true)));
+  document.getElementById("clearSel").addEventListener("click", () => cards.forEach(c => c._checkbox.checked && setSelected(c, false)));
+  openBtn.addEventListener("click", () => selected.forEach(folder => window.open(siteUrl(folder), "_blank")));
+  viewButtons.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+  searchEl.addEventListener("input", applyFilter);
 
-  searchEl.addEventListener("input", buildList);
-
-  buildList();
+  try { setView(localStorage.getItem("profiles-view") || "grid"); } catch { setView("grid"); }
+  applyFilter();
+  updateButton();
 </script>
 </body>
 </html>
