@@ -22,7 +22,7 @@ a {
 }
 header {
     background-color: antiquewhite;
-    background-image: url("/o/back.jpg");
+    background-image: url("pages/imgs/back.jpg");
     background-position: center top;
     background-repeat: no-repeat;
     line-height: 1.2;

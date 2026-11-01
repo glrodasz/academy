@@ -25,7 +25,7 @@ h1 h2 h3 {
 
 header {
   display: flex;
-  background-image: url("/markos-6727/asset/gradiente.jpg");
+  background-image: url("asset/gradiente.jpg");
   background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;

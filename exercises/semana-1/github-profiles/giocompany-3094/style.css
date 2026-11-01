@@ -16,7 +16,7 @@ body {
 
 .header {
     background-color: #263d36;
-    background-image: url("/giocompany-3094/github-profiles/giocompany-3094/img/dev.jpg");
+    background-image: url("img/dev.jpg");
     background-position: center top;
     background-repeat: no-repeat;
     background-size: cover;
