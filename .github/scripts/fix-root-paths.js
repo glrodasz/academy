@@ -13,7 +13,8 @@ const path = require("path");
 
 const galleryDir = path.resolve(process.argv[2]);
 
-const ATTR_RE = /(\s(?:href|src|action|poster|data)\s*=\s*)(["'])(\/(?!\/)[^"']*)\2/gi;
+// Quoted ("/x" or '/x') or unquoted (/x) attribute values.
+const ATTR_RE = /(\s(?:href|src|action|poster|data)\s*=\s*)(?:(["'])(\/(?!\/)[^"']*)\2|(\/(?!\/)[^\s"'=<>`]*))/gi;
 const SRCSET_RE = /(\ssrcset\s*=\s*)(["'])([^"']*)\2/gi;
 const CSS_URL_RE = /(url\(\s*)(["']?)(\/(?!\/)[^"')]*)\2(\s*\))/gi;
 const CSS_IMPORT_RE = /(@import\s+)(["'])(\/(?!\/)[^"']*)\2/gi;
@@ -74,7 +75,7 @@ for (const studentName of students) {
 
     if (ext !== ".css") {
       text = text
-        .replace(ATTR_RE, (m, pre, q, url) => pre + q + fix(url) + q)
+        .replace(ATTR_RE, (m, pre, q = "", quoted, unquoted) => pre + q + fix(quoted ?? unquoted) + q)
         .replace(SRCSET_RE, (m, pre, q, list) => pre + q + list.replace(/(^|,)(\s*)(\/(?!\/)\S*)/g,
           (c, sep, space, url) => sep + space + fix(url)) + q);
     }
