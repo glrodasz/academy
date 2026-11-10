@@ -13,7 +13,7 @@
   "dependencies": {
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
-    "next": "13.4.19",
+    "next": "15.5.28",
     "openai": "^4.6.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
