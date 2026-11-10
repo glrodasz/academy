@@ -1,0 +1,12 @@
+# Single workspace for every student and course project under exercises/ and content/.
+# One root pnpm-lock.yaml replaces the per-project lockfiles, so a vulnerability is
+# patched once (via "pnpm.overrides" in the root package.json) for all projects.
+# The public website keeps its own package-lock.json and is not part of the workspace.
+packages:
+  - "exercises/**"
+  - "content/**"
+  - "!website"
+
+# Student packages often share names with real dependencies ("bootstrap", "tailwind", ...);
+# never resolve a dependency to a workspace folder, always to the registry.
+linkWorkspacePackages: false

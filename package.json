@@ -1,0 +1,30 @@
+{
+  "name": "academy-workspace",
+  "private": true,
+  "description": "pnpm workspace that manages the dependencies of every project under exercises/ and content/ with a single lockfile.",
+  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "overrides": {
+      "vite@>=4 <4.5.14": "^4.5.14",
+      "vite@>=5 <5.4.21": "^5.4.21",
+      "vite@>=6 <6.4.6": "^6.4.6",
+      "postcss@>=8 <8.5.32": "^8.5.32",
+      "express@>=4 <4.22.3": "^4.22.3",
+      "body-parser@>=1 <1.20.9": "^1.20.9",
+      "path-to-regexp@<0.1.13": "~0.1.13",
+      "qs@>=6 <6.17.1": "^6.17.1",
+      "cookie@<0.7.2": "~0.7.2",
+      "send@<0.19.2": "~0.19.2",
+      "serve-static@>=1 <1.16.3": "^1.16.3",
+      "morgan@>=1 <1.12.1": "^1.12.1",
+      "on-headers@<1.1.0": "^1.1.0",
+      "semver@>=7 <7.5.2": "^7.8.6",
+      "minimatch@>=9 <9.0.9": "^9.0.9",
+      "zod@>=3 <3.25.76": "^3.25.76",
+      "pug-code-gen@>=3 <3.0.4": "^3.0.4",
+      "@remix-run/router@>=1 <1.23.4": "^1.23.4",
+      "react-router@>=6 <6.30.6": "^6.30.6",
+      "react-router-dom@>=6 <6.30.6": "^6.30.6"
+    }
+  }
+}

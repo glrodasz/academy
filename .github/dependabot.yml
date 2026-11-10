@@ -1,0 +1,17 @@
+# Security updates only (no routine version bumps).
+#  - "/"        → pnpm workspace with every project under exercises/ and content/ (one lockfile).
+#  - "/website" → the public site, with its own package-lock.json.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directories:
+      - "/"
+      - "/website"
+    schedule:
+      interval: weekly
+    # 0 disables version-update PRs; security-update PRs are still opened.
+    open-pull-requests-limit: 0
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
