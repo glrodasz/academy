@@ -16,7 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "dayjs": "^1.11.7",
-    "vite": "^4.2.1"
+    "vite": "^6.4.5"
   },
   "devDependencies": {
     "sass": "^1.62.0"
