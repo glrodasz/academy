@@ -15,6 +15,6 @@
     "@popperjs/core": "^2.11.7",
     "bootstrap": "^5.3.0-alpha2",
     "sass": "^1.60.0",
-    "vite": "^4.2.1"
+    "vite": "^6.4.5"
   }
 }
