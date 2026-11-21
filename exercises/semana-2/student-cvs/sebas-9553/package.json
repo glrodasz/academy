@@ -21,6 +21,6 @@
   },
   "homepage": "https://github.com/sebasvalencia/semana-2#readme",
   "dependencies": {
-    "vite": "^4.2.1"
+    "vite": "^6.4.5"
   }
 }
