@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^6.4.5"
+    "vite": "^8.3.8"
   },
   "dependencies": {
     "autoprefixer": "^10.4.14",
